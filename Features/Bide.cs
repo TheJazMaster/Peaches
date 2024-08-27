@@ -79,9 +79,11 @@ public class BideManager
 
     private static void Card_GetActualDamage_Postfix(State s, ref int __result, int baseDamage, bool targetPlayer = false, Card? card = null)
     {
-		Ship enemyShip = (s.route as Combat)?.otherShip!;
-		Ship ship = targetPlayer ? enemyShip : s.ship;
-        __result += ship.Get(ModEntry.Instance.BideStatus.Status);
+        if (card != null) {
+            Ship enemyShip = (s.route as Combat)?.otherShip!;
+            Ship ship = targetPlayer ? enemyShip : s.ship;
+            __result += ship.Get(ModEntry.Instance.BideStatus.Status);
+        }
     }
 
     private static void Card_GetActionsOverridden_Postfix(State s, Combat c, Card __instance, ref List<CardAction> __result)
