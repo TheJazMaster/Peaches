@@ -1,0 +1,221 @@
+{
+    "character": {
+        "name": "Peaches",
+        "description": [
+            "<c=DEA0A0>PEACHES</c>",
+            "Your supervisor. Her cards <c=downside>DISARM</c> your ship and <c=status>BIDE</c> to deal huge damage at once."
+        ]
+    },
+    "action": {
+        "makeFast": {
+            "cardSelectText": "Select a card to add <c=cardtrait>fast</c> to, forever.\n(<c=cardtrait>Fast</c> cards don't ruin <c=cardtrait>priority</c> cards when they're played before them!)",
+            "showCardText": "Made fast!"
+        }
+    },
+    "status": {
+        "Bide": {
+            "name": "Bide",
+            "description": "Add {0} damage to the next card attack."
+        },
+        "HardWorker": {
+            "name": "Hard Worker",
+            "description": "After playing a card that costs 2 or more <c=energy>ENERGY</c>, gain {0} <c=status>BIDE</c>."
+        },
+        "NeverendingRage": {
+            "name": "Neverending Rage",
+            "description": "The next time you would lose any amount of <c=status>BIDE</c>, instead lose 1 neverending rage."
+        },
+        "Simmer": {
+            "name": "Simmer",
+            "description": "Gain {0} <c=status>BIDE</c> every turn."
+        },
+        "Disarmed": {
+            "name": "Disarmed",
+            "description": "Attacks do nothing. <c=downside>Decreases by 1 at end of turn.</c>"
+        },
+        "FakeMissing1": {
+            "name": "Crewmate 1 is missing",
+            "description": "The next {0} <c=white>Crewmate 1</c> cards you play do nothing."
+        },
+        "FakeMissing2": {
+            "name": "Crewmate 2 is missing",
+            "description": "The next {0} <c=white>Crewmate 2</c> cards you play do nothing."
+        }
+    },
+    "trait": {
+        "priority": {
+            "name": "Priority",
+            "description": "This card has two separate sets of actions. If only <c=cardtrait>priority</c> and <c=cardtrait>fast</c> cards (or no cards) have been played this turn, the first set is played, <c=faint>otherwise the second set is played.",
+            "descriptionOff": "This card has two separate sets of actions. <c=faint>If only <c=cardtrait>priority</c> and <c=cardtrait>fast</c> cards (or no cards) have been played this turn, the first set is played,</c> otherwise the second set is played."
+        },
+        "fast": {
+            "name": "Fast",
+            "description": "Doesn't break chains of <c=cardtrait>priority</c> cards."
+        }
+    },
+    "artifact": {
+        "PunchingBag": {
+            "name": "PUNCHING BAG",
+            "description": "Non-<c=dea0a0>Peaches</c> cards and non-card attacks ignore <c=status>DISARM</c>."
+        },
+        "YogaLessons": {
+            "name": "YOGA LESSONS",
+            "description": "Whenever you receive <c=status>SHIELD</c> or <c=status>TEMP SHIELD</c>, spend 1 <c=status>BIDE</c> to increase the amount gained by 1."
+        },
+        "ForcedSoftwareUpdate": {
+            "name": "FORCED SOFTWARE UPDATE",
+            "description": "A <c=status>disarmed</c> attack instead gives 1 <c=status>BIDE</c>."
+        },
+        "PriorityMail": {
+            "name": "PRIORITY MAIL",
+            "description": "On pickup, choose 2 cards in your deck to make <c=cardtrait>fast</c>."
+        },
+        "FramedPhotograph": {
+            "name": "FRAMED PHOTOGRAPH",
+            "description": "When your ship would lose all its hull, lose all but one max hull instead, gain 1 <c=status>PERFECT SHIELD</c> and 7 <c=status>BIDE</c>. <c=downside>Can only trigger once.</c>"
+        },
+        "SurveillanceDrones": {
+            "name": "SURVEILLANCE DRONES",
+            "description": "Whenever you spend any amount of <c=status>BIDE</c>, gain as much <c=status>TEMP SHIELD</c>."
+        },
+        "BigGuns": {
+            "name": "BIG GUNS",
+            "description": "Gain 1 extra <c=energy>ENERGY</c> every turn. <c=downside>Cards always cost at least 1 energy to play.</c>"
+        }
+    },
+    "card": {
+        "Anger": {
+            "name": "Anger"
+        },
+        "AngerManagement": {
+            "name": "Anger Control"
+        },
+        "BottleUp": {
+            "name": "Bottle Up",
+            "description": {
+                "None": "X = <c=status>bide</c>. Lose all <c=status>bide</c>. Add a <c=card>Break the Bottle</c> to your <c=keyword>hand</c>.",
+                "A": "X = <c=status>bide</c>. Lose all <c=status>bide</c>. Add a <c=card>Break the Bottle</c> to your <c=keyword>hand</c>, <c=cardtrait>discounted</c>.",
+                "B": "X = <c=status>bide</c>. Lose all <c=status>bide</c>. Add a <c=card>Break the Bottle B</c> to your <c=keyword>hand</c>."
+            }
+        },
+        "BreakTheBottle": {
+            "name": "Break the Bottle"
+        },
+        "Eruption": {
+            "name": "Eruption",
+            "description": {
+                "None": "Attack for <c=damage>{{Damage}}</c> damage. (Affected <c=keyword>twice</c> by damage increases.)",
+                "A": "Attack for <c=damage>{{Damage}}</c> damage. (Affected <c=keyword>twice</c> by damage increases.)",
+                "B": "Attack for <c=damage>{{Damage}}</c> damage. (Affected <c=keyword>thrice</c> by damage increases.)"
+            }
+        },
+        "Finisher": {
+            "name": "Finisher"
+        },
+        "FuckOff": {
+            "name": "Fuck Off!"
+        },
+        "HardWorker": {
+            "name": "Hard Worker"
+        },
+        "HellsFury": {
+            "name": "Hell's Fury"
+        },
+        "HitEm": {
+            "name": "Hit 'Em"
+        },
+        "LeaveAMessage": {
+            "name": "Leave A Message"
+        },
+        "LetMeAtEm": {
+            "name": "Let me at 'Em!"
+        },
+        "NeverendingRage": {
+            "name": "Neverending Rage"
+        },
+        "LetMeFinish": {
+            "name": "Let Me Finish"
+        },
+        "OverloadCannons": {
+            "name": "Overload Cannons"
+        },
+        "Overtime": {
+            "name": "Overtime",
+            "description": {
+                "None": {
+                    "priority": "Discard all <c=attack>attacking</c> cards and draw as many cards + 2<c=faint>/1</c>.",
+                    "noPriority": "Discard all <c=attack>attacking</c> cards and draw as many cards + <c=faint>2/</c>1."
+                },
+                "A": {
+                    "priority": "Discard all attacking cards and draw as many cards + 3<c=faint>/2</c>.",
+                    "noPriority": "Discard all attacking cards and draw as many cards + <c=faint>3/</c>2."
+                },
+                "B": {
+                    "priority": "Discard all attacking cards and draw as many cards + 2<c=faint>/1</c>.",
+                    "noPriority": "Discard all attacking cards and draw as many cards + <c=faint>2/</c>1."
+                }
+            }
+        },
+        "Simmer": {
+            "name": "Simmer"
+        },
+        "SmashControls": {
+            "name": "Smash Controls"
+        },
+        "SurpriseShot": {
+            "name": "Surprise Shot"
+        },
+        "Swerve": {
+            "name": "Swerve"
+        },
+        "TheCalm": {
+            "name": "The Calm",
+            "description": {
+                "None": {
+                    "priority": "Gain 3<c=faint>/5</c> <c=status>disarm</c>. Add <c=card>The Storm</c> to your <c=keyword>discard pile</c>.",
+                    "noPriority": "Gain <c=faint>3/</c>5 <c=status>disarm</c>. Add <c=card>The Storm</c> to your <c=keyword>discard pile</c>."
+                },
+                "A": {
+                    "priority": "Gain 3<c=faint>/5</c> <c=status>disarm</c>. Add <c=card>The Storm A</c> to your <c=keyword>discard pile</c>.",
+                    "noPriority": "Gain <c=faint>3/</c>5 <c=status>disarm</c>. Add <c=card>The Storm A</c> to your <c=keyword>discard pile</c>."
+                },
+                "B": {
+                    "priority": "Gain 2<c=faint>/4</c> <c=status>disarm</c>. Add <c=card>The Storm</c> to your <c=keyword>discard pile</c>.",
+                    "noPriority": "Gain <c=faint>2/</c>4 <c=status>disarm</c>. Add <c=card>The Storm</c> to your <c=keyword>discard pile</c>."
+                }
+            }
+        },
+        "TheStorm": {
+            "name": "The Storm"
+        },
+        "ViolentDaydreams": {
+            "name": "Violent Daydreams",
+            "description": {
+                "None": "Gain 1 <c=status>disarm</c>. Draw all <c=action>attacking</c> cards from the <c=keyword>draw pile</c>.",
+                "A": "Gain 1 <c=status>disarm</c>. Draw all <c=action>attacking</c> cards from the <c=keyword>draw pile</c>.",
+                "B": "Draw all <c=action>attacking</c> cards from the <c=keyword>draw pile</c>."
+            }
+        },
+        "WhereItHurts": {
+            "name": "Where It Hurts",
+            "description": {
+                "None": "Random enemy part becomes <c=parttrait>brittle</c> until hit.",
+                "A": "Gain 1 <c=status>bide</c>.\nRandom enemy part becomes <c=parttrait>brittle</c> until hit.",
+                "B": "Two random enemy parts become <c=downside>secretly</c> <c=parttrait>brittle</c> until hit."
+            }
+        },
+        "YouCantHide": {
+            "name": "You Can't Hide!"
+        },
+        "YoureFired": {
+            "name": "You're Fired!",
+            "tooltip": {
+                "desc": "<c=action>X</c> = your total amount of {{Text}} combined{{Count}}.",
+                "segment": "<c={{Color}}>{{Character}}</c> cards",
+                "delimiter": ", ",
+                "delimiterFinal": " and ",
+                "placeholder": "crewmate {{Number}}"
+            }
+        }
+    }
+}
