@@ -3,7 +3,7 @@
         "name": "Peaches",
         "description": [
             "<c=DEA0A0>PEACHES</c>",
-            "Your supervisor. Her cards <c=downside>DISARM</c> your ship and <c=status>BIDE</c> to deal huge damage at once."
+            "Your supervisor. Her cards <c=downside>DISARM</c> your ship and <c=status>FURY</c> to deal huge damage at once."
         ]
     },
     "action": {
@@ -14,20 +14,20 @@
     },
     "status": {
         "Bide": {
-            "name": "Bide",
+            "name": "Fury",
             "description": "Add {0} damage to the next card attack."
         },
         "HardWorker": {
             "name": "Hard Worker",
-            "description": "After playing a card that costs 2 or more <c=energy>ENERGY</c>, gain {0} <c=status>BIDE</c>."
+            "description": "After playing a card that costs 2 or more <c=energy>ENERGY</c>, gain {0} <c=status>FURY</c>."
         },
         "NeverendingRage": {
             "name": "Neverending Rage",
-            "description": "The next time you would lose any amount of <c=status>BIDE</c>, instead lose 1 neverending rage."
+            "description": "The next time you would lose any amount of <c=status>FURY</c>, instead lose 1 neverending rage."
         },
         "Simmer": {
             "name": "Simmer",
-            "description": "Gain {0} <c=status>BIDE</c> every turn."
+            "description": "Gain {0} <c=status>FURY</c> every turn."
         },
         "Disarmed": {
             "name": "Disarmed",
@@ -60,11 +60,11 @@
         },
         "YogaLessons": {
             "name": "YOGA LESSONS",
-            "description": "Whenever you receive <c=status>SHIELD</c> or <c=status>TEMP SHIELD</c>, spend 1 <c=status>BIDE</c> to increase the amount gained by 1."
+            "description": "Whenever you receive <c=status>SHIELD</c> or <c=status>TEMP SHIELD</c>, spend 1 <c=status>FURY</c> to increase the amount gained by 1."
         },
         "ForcedSoftwareUpdate": {
             "name": "FORCED SOFTWARE UPDATE",
-            "description": "A <c=status>disarmed</c> attack instead gives 1 <c=status>BIDE</c>."
+            "description": "A <c=status>disarmed</c> attack instead gives 1 <c=status>FURY</c>."
         },
         "PriorityMail": {
             "name": "PRIORITY MAIL",
@@ -72,11 +72,11 @@
         },
         "FramedPhotograph": {
             "name": "FRAMED PHOTOGRAPH",
-            "description": "When your ship would lose all its hull, lose all but one max hull instead, gain 1 <c=status>PERFECT SHIELD</c> and 7 <c=status>BIDE</c>. <c=downside>Can only trigger once.</c>"
+            "description": "When your ship would lose all its hull, lose all but one max hull instead, gain 1 <c=status>PERFECT SHIELD</c> and 7 <c=status>FURY</c>. <c=downside>Can only trigger once.</c>"
         },
         "SurveillanceDrones": {
             "name": "SURVEILLANCE DRONES",
-            "description": "Whenever you spend any amount of <c=status>BIDE</c>, gain as much <c=status>TEMP SHIELD</c>."
+            "description": "Whenever you spend any amount of <c=status>FURY</c>, gain as much <c=status>TEMP SHIELD</c>."
         },
         "BigGuns": {
             "name": "BIG GUNS",
@@ -93,13 +93,16 @@
         "BottleUp": {
             "name": "Bottle Up",
             "description": {
-                "None": "X = <c=status>bide</c>. Lose all <c=status>bide</c>. Add a <c=card>Break the Bottle</c> to your <c=keyword>hand</c>.",
-                "A": "X = <c=status>bide</c>. Lose all <c=status>bide</c>. Add a <c=card>Break the Bottle</c> to your <c=keyword>hand</c>, <c=cardtrait>discounted</c>.",
-                "B": "X = <c=status>bide</c>. Lose all <c=status>bide</c>. Add a <c=card>Break the Bottle B</c> to your <c=keyword>hand</c>."
+                "None": "X = <c=status>fury</c>. Lose all <c=status>fury</c>. Add a <c=card>Break the Bottle</c> to your <c=keyword>hand</c>.",
+                "A": "X = <c=status>fury</c>. Lose all <c=status>fury</c>. Add a <c=card>Break the Bottle</c> to your <c=keyword>hand</c>, <c=cardtrait>discounted</c>.",
+                "B": "X = <c=status>fury</c>. Lose all <c=status>fury</c>. Add a <c=card>Break the Bottle B</c> to your <c=keyword>hand</c>."
             }
         },
         "BreakTheBottle": {
             "name": "Break the Bottle"
+        },
+        "Catharsis": {
+            "name": "Catharsis"
         },
         "Eruption": {
             "name": "Eruption",
@@ -199,8 +202,14 @@
         "WhereItHurts": {
             "name": "Where It Hurts",
             "description": {
-                "None": "Random enemy part becomes <c=parttrait>brittle</c> until hit.",
-                "A": "Gain 1 <c=status>bide</c>.\nRandom enemy part becomes <c=parttrait>brittle</c> until hit.",
+                "None": {
+                    "priority": "Random enemy part becomes <c=parttrait>brittle</c><c=faint>/weak</c> until hit.",
+                    "noPriority": "Random enemy part becomes <c=faint>brittle/</c><c=parttrait>weak</c> until hit."
+                },
+                "A": {
+                    "priority": "Gain 1 <c=status>fury</c>.\nRandom enemy part becomes <c=parttrait>brittle</c><c=faint>/weak</c> until hit.",
+                    "noPriority": "Gain 1 <c=status>fury</c>.\nRandom enemy part becomes <c=faint>brittle/</c><c=parttrait>weak</c> until hit."
+                },
                 "B": "Two random enemy parts become <c=downside>secretly</c> <c=parttrait>brittle</c> until hit."
             }
         },

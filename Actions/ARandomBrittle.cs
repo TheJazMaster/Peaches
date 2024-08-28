@@ -13,13 +13,15 @@ public class ARandomBrittle : CardAction
     public bool single = false;
     public int count = 1;
     public bool targetPlayer = false;
+    public bool weakInstead = false;
     
     public override void Begin(G g, State s, Combat c)
     {
         Ship ship = targetPlayer ? s.ship : c.otherShip;
+        PDamMod mod = weakInstead ? PDamMod.weak : PDamMod.brittle;
         
         var list = (from pair in ship.parts.Select((Part part, int x) => new {part, x})
-            where pair.part.damageModifier != PDamMod.brittle && pair.part.type != PType.empty select pair).ToList();
+            where pair.part.damageModifier != mod && pair.part.damageModifier != PDamMod.brittle && pair.part.type != PType.empty select pair).ToList();
         
         list = list.Shuffle(s.rngActions).Take(count).ToList();
 
@@ -27,9 +29,13 @@ public class ARandomBrittle : CardAction
             var part = pair.part;
             var x = pair.x;
 
-			SingleBrittleManager.SetBrittleData(part, single);
+            SingleDamModManager.SetData(part, single);
 
-            c.QueueImmediate(new ABrittle
+            c.QueueImmediate(weakInstead ? new AWeaken
+			{
+				targetPlayer = targetPlayer,
+				worldX = x + ship.x
+			} : new ABrittle
 			{
 				targetPlayer = targetPlayer,
 				worldX = x + ship.x,

@@ -61,7 +61,7 @@ internal sealed class HitEmCard : Card, IPeachesCard
 }
 
 
-internal sealed class WhereItHurtsCard : Card, IPeachesCard
+internal sealed class WhereItHurtsCard : Card, IPeachesCard, IHasCustomCardTraits
 {
 	public static void Register(IModHelper helper) {
 		helper.Content.Cards.RegisterCard("WhereItHurts", new()
@@ -80,12 +80,15 @@ internal sealed class WhereItHurtsCard : Card, IPeachesCard
 
 	public override CardData GetData(State state) => new() {
 		cost = 1,
-		description = ModEntry.Instance.Localizations.Localize(["card", "WhereItHurts", "description", upgrade.ToString()])
+		description = upgrade == Upgrade.B ? ModEntry.Instance.Localizations.Localize(["card", "WhereItHurts", "description", "B"]) :
+			ModEntry.Instance.Localizations.Localize(["card", "WhereItHurts", "description", upgrade.ToString(), HasRuinedPriority(state, this) ? "noPriority" : "priority"])
 	};
+
+	public IReadOnlySet<ICardTraitEntry> GetInnateTraits(State state) => upgrade == Upgrade.B ? [] : new HashSet<ICardTraitEntry> { PriorityTrait };
 
 	public override List<CardAction> GetActions(State s, Combat c) => upgrade switch
 	{
-		Upgrade.A => [
+		Upgrade.A => PrioritySet(s, this, [
 			new ARandomBrittle
 			{
 				single = true
@@ -96,21 +99,39 @@ internal sealed class WhereItHurtsCard : Card, IPeachesCard
 				statusAmount = 1,
 				targetPlayer = true
 			}
-		],
+		], [
+			new ARandomBrittle
+			{
+				single = true,
+				weakInstead = true
+			},
+			new AStatus
+			{
+				status = ModEntry.Instance.BideStatus.Status,
+				statusAmount = 1,
+				targetPlayer = true
+			}
+		]),
 		Upgrade.B => [
 			new ARandomBrittle
 			{
 				single = true,
 				hidden = true,
 				count = 2
-			},
+			}
 		],
-		_ => [
+		_ => PrioritySet(s, this, [
 			new ARandomBrittle
 			{
 				single = true
-			},
-		]
+			}
+		], [
+			new ARandomBrittle
+			{
+				single = true,
+				weakInstead = true
+			}
+		])
 	};
 }
 
@@ -277,7 +298,8 @@ internal sealed class FinisherCard : Card, IPeachesCard, IHasCustomCardTraits
 			{
 				deck = ModEntry.Instance.PeachesDeck.Deck,
 				rarity = Rarity.common,
-				upgradesTo = [Upgrade.A, Upgrade.B]
+				upgradesTo = [Upgrade.A, Upgrade.B],
+				dontOffer = true
 			},
 			Name = ModEntry.Instance.AnyLocalizations.Bind(["card", "Finisher", "name"]).Localize,
 			Art = StableSpr.cards_Cannon
@@ -312,6 +334,72 @@ internal sealed class FinisherCard : Card, IPeachesCard, IHasCustomCardTraits
 			},
 			new AEndTurn()
 		]
+	};
+}
+
+
+internal sealed class CatharsisCard : Card, IPeachesCard, IHasCustomCardTraits
+{
+	public static void Register(IModHelper helper) {
+		helper.Content.Cards.RegisterCard("Catharsis", new()
+		{
+			CardType = MethodBase.GetCurrentMethod()!.DeclaringType!,
+			Meta = new()
+			{
+				deck = ModEntry.Instance.PeachesDeck.Deck,
+				rarity = Rarity.common,
+				upgradesTo = [Upgrade.A, Upgrade.B],
+				dontOffer = true
+			},
+			Name = ModEntry.Instance.AnyLocalizations.Bind(["card", "Catharsis", "name"]).Localize,
+			Art = StableSpr.cards_Cannon
+		});
+	}
+
+	public override CardData GetData(State state) => new() {
+		cost = 1
+	};
+
+	public IReadOnlySet<ICardTraitEntry> GetInnateTraits(State state) => new HashSet<ICardTraitEntry> { PriorityTrait };
+
+	public override List<CardAction> GetActions(State s, Combat c) => upgrade switch
+	{
+		Upgrade.B => PrioritySet(s, this, [
+			new AStatus {
+				status = ModEntry.Instance.DisarmedStatus.Status,
+				statusAmount = 3,
+				targetPlayer = true
+			},
+			new AStatus {
+				status = ModEntry.Instance.BideStatus.Status,
+				statusAmount = 4,
+				targetPlayer = true
+			}
+		], [
+			new AStatus {
+				status = ModEntry.Instance.DisarmedStatus.Status,
+				statusAmount = -2,
+				targetPlayer = true
+			}
+		]),
+		_ => PrioritySet(s, this, [
+			new AStatus {
+				status = ModEntry.Instance.DisarmedStatus.Status,
+				statusAmount = 2,
+				targetPlayer = true
+			},
+			new AStatus {
+				status = ModEntry.Instance.BideStatus.Status,
+				statusAmount = upgrade == Upgrade.A ? 3 : 2,
+				targetPlayer = true
+			}
+		], [
+			new AStatus {
+				status = ModEntry.Instance.DisarmedStatus.Status,
+				statusAmount = -2,
+				targetPlayer = true
+			}
+		])
 	};
 }
 
@@ -434,7 +522,7 @@ internal sealed class HellsFuryCard : Card, IPeachesCard
 	public override CardData GetData(State state) => new() {
 		cost = 2,
 		retain = true,
-		flippable = upgrade == Upgrade.B
+		flippable = true,
 	};
 
 	public override List<CardAction> GetActions(State s, Combat c) => upgrade switch
@@ -442,7 +530,7 @@ internal sealed class HellsFuryCard : Card, IPeachesCard
 		Upgrade.B => [
 			new AMove
 			{
-				dir = -2,
+				dir = -3,
 				targetPlayer = true
 			},
 			new AStatus
@@ -694,7 +782,8 @@ internal sealed class LeaveAMessageCard : Card, IPeachesCard, IHasCustomCardTrai
 
 	public override CardData GetData(State state) => new() {
 		cost = upgrade == Upgrade.A ? 1 : 2,
-		exhaust = upgrade != Upgrade.B
+		retain = upgrade == Upgrade.B,
+		exhaust = true
 	};
 
 	public IReadOnlySet<ICardTraitEntry> GetInnateTraits(State state) => new HashSet<ICardTraitEntry> { PriorityTrait };
@@ -712,7 +801,12 @@ internal sealed class LeaveAMessageCard : Card, IPeachesCard, IHasCustomCardTrai
 			targetPlayer = true
 		}
 	], [
-		new ADummyAction()
+		new AStatus
+		{
+			status = Status.tempShield,
+			statusAmount = 1,
+			targetPlayer = true
+		}
 	]);
 }
 
@@ -739,20 +833,30 @@ internal sealed class LetMeAtEmCard : Card, IPeachesCard
 		exhaust = true
 	};
 
-	public override List<CardAction> GetActions(State s, Combat c) => [
-		new AAttack
-		{
-			damage = GetDmg(s, upgrade == Upgrade.A ? 5 : 2),
-			piercing = true,
-			brittle = true
-		},
-		new AStatus
-		{
-			status = ModEntry.Instance.PeachesCharacter.MissingStatus.Status,
-			statusAmount = upgrade == Upgrade.B ? 1 : 2,
-			targetPlayer = true
-		}
-	];
+	public override List<CardAction> GetActions(State s, Combat c) => upgrade switch {
+		Upgrade.B => [
+			new AAttack
+			{
+				damage = GetDmg(s, 2),
+				piercing = true,
+				brittle = true
+			}
+		],
+		_ => [
+			new AAttack
+			{
+				damage = GetDmg(s, upgrade == Upgrade.A ? 5 : 2),
+				piercing = true,
+				brittle = true
+			},
+			new AStatus
+			{
+				status = ModEntry.Instance.PeachesCharacter.MissingStatus.Status,
+				statusAmount = 1,
+				targetPlayer = true
+			}
+		]
+	};
 }
 
 
@@ -818,7 +922,6 @@ internal sealed class FuckOffCard : Card, IPeachesCard
 	public override CardData GetData(State state) => new() {
 		cost = upgrade switch {
 			Upgrade.A => 3,
-			Upgrade.B => 2,
 			_ => 4
 		},
 		exhaust = true

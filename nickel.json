@@ -1,6 +1,6 @@
 {
     "UniqueName": "TheJazMaster.Peaches",
-    "Version": "0.4.2",
+    "Version": "0.4.3",
     "DisplayName": "Peaches, your supervisor",
     "RequiredApiVersion": "0.1.0",
     "EntryPointAssembly": "Peaches.dll",

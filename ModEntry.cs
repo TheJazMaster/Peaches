@@ -22,7 +22,8 @@ public sealed class ModEntry : SimpleMod {
     internal Harmony Harmony { get; }
 	internal IKokoroApi KokoroApi { get; }
 	internal IMoreDifficultiesApi MoreDifficultiesApi { get; }
-	internal SingleBrittleManager SingleBrittleManager { get; }
+	internal SingleDamModManager SingleBrittleManager { get; }
+	internal SingleDamModManager SingleWeakManager { get; }
 	internal ILocalizationProvider<IReadOnlyList<string>> AnyLocalizations { get; }
 	internal ILocaleBoundNonNullLocalizationProvider<IReadOnlyList<string>> Localizations { get; }
 
@@ -56,7 +57,7 @@ public sealed class ModEntry : SimpleMod {
 	internal static IReadOnlyList<Type> CommonCardTypes { get; } = [
 		typeof(SwerveCard),
 		typeof(SimmerCard),
-		typeof(FinisherCard),
+		typeof(CatharsisCard),
 		typeof(AngerManagementCard),
 		typeof(SurpriseShotCard),
 		typeof(AngerCard),
@@ -118,7 +119,8 @@ public sealed class ModEntry : SimpleMod {
 		DynamicWidthCardAction.ApplyPatches(Harmony);
 		_ = new CardBrowseFilterManager();
 		_ = new BideManager();
-		SingleBrittleManager = new SingleBrittleManager();
+		SingleBrittleManager = new SingleDamModManager(PDamMod.brittle);
+		SingleWeakManager = new SingleDamModManager(PDamMod.weak);
 		_ = new DisarmManager();
 		_ = new HardWorkerManager();
 		_ = new ArtifactInterfacesManager();
