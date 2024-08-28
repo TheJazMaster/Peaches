@@ -47,12 +47,6 @@ public class PriorityManager
                     TitleColor = Colors.action,
                     Title = ModEntry.Instance.Localizations.Localize(["trait", "priority", "name"]),
                     Description = ModEntry.Instance.Localizations.Localize(["trait", "priority", "description"]),
-                },
-                new GlossaryTooltip($"trait.{GetType().Namespace!}::Fast") {
-                    Icon = FastIcon,
-                    TitleColor = Colors.action,
-                    Title = ModEntry.Instance.Localizations.Localize(["trait", "fast", "name"]),
-                    Description = ModEntry.Instance.Localizations.Localize(["trait", "fast", "description"]),
                 }
             ]
         });

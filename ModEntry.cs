@@ -257,6 +257,17 @@ public sealed class ModEntry : SimpleMod {
 		foreach (var artifactType in AllArtifactTypes)
 			AccessTools.DeclaredMethod(artifactType, nameof(IPeachesCard.Register))?.Invoke(null, [helper]);
 
+			helper.Content.Cards.OnGetFinalDynamicCardTraitOverrides += (card, data) => {
+			State state = data.State;
+			if (state.route is Combat combat) {
+				foreach (Artifact item in data.State.EnumerateAllArtifacts()) {
+					if (item is PriorityMail artifact && artifact.active && !data.TraitStates[PriorityManager.PriorityTrait].IsActive) {
+						data.SetOverride(PriorityManager.FastTrait, true);
+					}
+				}
+			}
+		};
+
 		MoreDifficultiesApi?.RegisterAltStarters(PeachesDeck.Deck, new() {
 			cards = [
 				new AngerManagementCard(),

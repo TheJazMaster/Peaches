@@ -45,8 +45,8 @@
     "trait": {
         "priority": {
             "name": "Priority",
-            "description": "This card has two separate sets of actions. If only <c=cardtrait>priority</c> and <c=cardtrait>fast</c> cards (or no cards) have been played this turn, the first set is played, <c=faint>otherwise the second set is played.",
-            "descriptionOff": "This card has two separate sets of actions. <c=faint>If only <c=cardtrait>priority</c> and <c=cardtrait>fast</c> cards (or no cards) have been played this turn, the first set is played,</c> otherwise the second set is played."
+            "description": "This card has two separate sets of actions. If only <c=cardtrait>priority</c> cards (or no cards) have been played this turn, the first set is played, <c=faint>otherwise the second set is played.",
+            "descriptionOff": "This card has two separate sets of actions. <c=faint>If only <c=cardtrait>priority</c> cards (or no cards) have been played this turn, the first set is played,</c> otherwise the second set is played."
         },
         "fast": {
             "name": "Fast",
@@ -68,7 +68,7 @@
         },
         "PriorityMail": {
             "name": "PRIORITY MAIL",
-            "description": "On pickup, choose 2 cards in your deck to make <c=cardtrait>fast</c>."
+            "description": "The first card you play each turn is <c=cardtrait>fast</c>."
         },
         "FramedPhotograph": {
             "name": "FRAMED PHOTOGRAPH",

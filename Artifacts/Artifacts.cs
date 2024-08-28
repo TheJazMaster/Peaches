@@ -117,6 +117,8 @@ public class FramedPhotograph : Artifact, IPeachesArtifact, IOnSurviveArtifact
 
 public class PriorityMail : Artifact, IPeachesArtifact
 {
+	internal bool active = true;
+
 	public static void Register(IModHelper helper) {
 		helper.Content.Artifacts.RegisterArtifact("PriorityMail", new() {
 			ArtifactType = MethodBase.GetCurrentMethod().DeclaringType,
@@ -130,18 +132,15 @@ public class PriorityMail : Artifact, IPeachesArtifact
 		});
 	}
 
-	public override void OnReceiveArtifact(State state)
-	{
-		for (int i = 0; i < 2; i++) {
-			state.GetCurrentQueue().QueueImmediate(new ACardSelect {
-				browseAction = new AMakeFast(),
-				browseSource = CardBrowse.Source.Deck,
-				filterMinCost = 1
-			}.ApplyModData(CardBrowseFilterManager.FilterFastKey, false).ApplyModData(CardBrowseFilterManager.FilterPriorityKey, false));
-		}
+	public override void OnPlayerPlayCard(int energyCost, Deck deck, Card card, State state, Combat combat, int handPosition, int handCount) {
+		active = false;
 	}
 
-	public override List<Tooltip> GetExtraTooltips() => PriorityManager.PriorityTrait.Configuration.Tooltips(DB.fakeState, null).ToList();
+	public override void OnTurnStart(State state, Combat combat) {
+		active = true;
+	}
+
+	public override List<Tooltip> GetExtraTooltips() => PriorityManager.FastTrait.Configuration.Tooltips(DB.fakeState, null).ToList();
 }
 
 public class SurveillanceDrones : Artifact, IPeachesArtifact, IBideSpenderArtifact
