@@ -352,7 +352,7 @@ internal sealed class CatharsisCard : Card, IPeachesCard, IHasCustomCardTraits
 				dontOffer = true
 			},
 			Name = ModEntry.Instance.AnyLocalizations.Bind(["card", "Catharsis", "name"]).Localize,
-			Art = StableSpr.cards_Cannon
+			Art = StableSpr.cards_riggs
 		});
 	}
 
@@ -470,7 +470,7 @@ internal sealed class AngerCard : Card, IPeachesCard
 				upgradesTo = [Upgrade.A, Upgrade.B]
 			},
 			Name = ModEntry.Instance.AnyLocalizations.Bind(["card", "Anger", "name"]).Localize,
-			Art = StableSpr.cards_AggressiveArmoring
+			Art = StableSpr.cards_BoostCapacitors
 		});
 	}
 
@@ -873,12 +873,12 @@ internal sealed class ViolentDaydreamsCard : Card, IPeachesCard
 				upgradesTo = [Upgrade.A, Upgrade.B]
 			},
 			Name = ModEntry.Instance.AnyLocalizations.Bind(["card", "ViolentDaydreams", "name"]).Localize,
-			Art = StableSpr.cards_WeakenHull
+			Art = StableSpr.cards_CloudSave
 		});
 	}
 
 	public override CardData GetData(State state) => new() {
-		cost = upgrade == Upgrade.A ? 0 : 1,
+		cost = upgrade == Upgrade.B ? 1 : 0,
 		exhaust = upgrade == Upgrade.B,
 		description = ModEntry.Instance.Localizations.Localize(["card", "ViolentDaydreams", "description", upgrade.ToString()]),
 	};
@@ -886,6 +886,19 @@ internal sealed class ViolentDaydreamsCard : Card, IPeachesCard
 	public override List<CardAction> GetActions(State s, Combat c) => upgrade switch {
 		Upgrade.B => [
 			new ADrawAllAttacks()
+		],
+		Upgrade.A => [
+			new ADrawAllAttacks(),
+			new AEnergy
+			{
+				changeAmount = 1
+			},
+			new AStatus
+			{
+				status = ModEntry.Instance.DisarmedStatus.Status,
+				statusAmount = 1,
+				targetPlayer = true
+			}
 		],
 		_ => [
 			new ADrawAllAttacks(),

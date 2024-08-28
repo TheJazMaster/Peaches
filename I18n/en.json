@@ -195,7 +195,7 @@
             "name": "Violent Daydreams",
             "description": {
                 "None": "Gain 1 <c=status>disarm</c>. Draw all <c=action>attacking</c> cards from the <c=keyword>draw pile</c>.",
-                "A": "Gain 1 <c=status>disarm</c>. Draw all <c=action>attacking</c> cards from the <c=keyword>draw pile</c>.",
+                "A": "Gain 1 <c=status>disarm</c> and 1 <c=energy>energy</c>. Draw all <c=action>attacking</c> cards from the <c=keyword>draw pile</c>.",
                 "B": "Draw all <c=action>attacking</c> cards from the <c=keyword>draw pile</c>."
             }
         },
