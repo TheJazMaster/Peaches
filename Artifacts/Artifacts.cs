@@ -62,7 +62,7 @@ public class ForcedSoftwareUpdate : Artifact, IPeachesArtifact, IOnDisarmArtifac
 
 public class FramedPhotograph : Artifact, IPeachesArtifact, IOnSurviveArtifact
 {
-	bool active = true;
+	public bool active = true;
 	static Spr ActiveSprite;
 	static Spr InactiveSprite;
 
@@ -117,7 +117,7 @@ public class FramedPhotograph : Artifact, IPeachesArtifact, IOnSurviveArtifact
 
 public class PriorityMail : Artifact, IPeachesArtifact
 {
-	internal bool active = true;
+	public bool active = true;
 
 	public static void Register(IModHelper helper) {
 		helper.Content.Artifacts.RegisterArtifact("PriorityMail", new() {
