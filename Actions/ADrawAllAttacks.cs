@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 
-#nullable enable
-namespace TheJazMaster.Peaches.Actions;
+namespace TheJazMaster.UnseenEffort.Actions;
 
 public class ADrawAllAttacks : CardAction
 {   
@@ -26,6 +25,6 @@ public class ADrawAllAttacks : CardAction
 
 
     public override Icon? GetIcon(State s) {
-        return new Icon(ModEntry.Instance.DrawAttacksIcon.Sprite, null, Colors.textMain);
+        return new Icon(ModEntry.Instance.DrawAttacksIcon, null, Colors.textMain);
     }
 }

@@ -1,229 +1,451 @@
 {
     "character": {
-        "name": "Peaches",
-        "description": [
-            "<c=DEA0A0>PEACHES</c>",
-            "Your supervisor. Her cards <c=downside>DISARM</c> your ship and <c=status>FURY</c> to deal huge damage at once."
-        ]
+        "Peaches": {
+            "name": "Peaches",
+            "description": [
+                "<c=DEA0A0>PEACHES</c>",
+                "Your supervisor. Her cards <c=downside>DISARM</c> your ship and <c=status>FURY</c> to deal huge damage at once."
+            ]
+        },
+        "Carrie": {
+            "name": "Carrie",
+            "description": [
+                "<c=464764>CARRIE</c>",
+                "Your material handler. At her prime early in a loop. Her cards offer either <c=keyword>very short-term</c> or <c=keyword>unique long term</c> benefits."
+            ]
+        }
     },
     "action": {
         "makeFast": {
             "cardSelectText": "Select a card to add <c=cardtrait>fast</c> to, forever.\n(<c=cardtrait>Fast</c> cards don't ruin <c=cardtrait>priority</c> cards when they're played before them!)",
             "showCardText": "Made fast!"
+        },
+        "brittle": {
+            "hidden": {
+                "single": {
+                    "name": "hidden temp brittle",
+                    "description": {
+                        "singular": "<c=keyword>{{Amount}}</c> random enemy part becomes <c=downside>secretly</c> <c=parttrait>brittle</c> until hit.",
+                        "plural": "<c=keyword>{{Amount}}</c> random enemy parts become <c=downside>secretly</c> <c=parttrait>brittle</c> until hit."
+                    }
+                },
+                "normal": {
+                    "name": "hidden brittle",
+                    "description": {
+                        "singular": "<c=keyword>{{Amount}}</c> random enemy part becomes <c=downside>secretly</c> <c=parttrait>brittle</c>.",
+                        "plural": "<c=keyword>{{Amount}}</c> random enemy parts become <c=downside>secretly</c> <c=parttrait>brittle</c>."
+                    }
+                }
+            },
+            "normal": {
+                "single": {
+                    "name": "temp brittle",
+                    "description": {
+                        "singular": "<c=keyword>{{Amount}}</c> random enemy part becomes <c=parttrait>brittle</c> until hit.",
+                        "plural": "<c=keyword>{{Amount}}</c> random enemy parts become <c=parttrait>brittle</c> until hit."
+                    }
+                },
+                "normal": {
+                    "name": "brittle",
+                    "description": {
+                        "singular": "<c=keyword>{{Amount}}</c> random enemy part becomes <c=parttrait>brittle</c>.",
+                        "plural": "<c=keyword>{{Amount}}</c> random enemy parts become <c=parttrait>brittle</c>."
+                    }
+                }
+            }
+        },
+
+        "variableHintSingleUse": "X = the amount of <c=cardtrait>single-use</c> cards in your deck{{Parentheses}}.",
+        "upgrade": {
+            "cardSelectText": "Choose a card to upgrade."
         }
     },
     "status": {
-        "Bide": {
-            "name": "Fury",
+        "Fury": {
+            "name": "fury",
             "description": "Add {0} damage to the next card attack."
         },
         "HardWorker": {
-            "name": "Hard Worker",
+            "name": "hard worker",
             "description": "After playing a card that costs 2 or more <c=energy>ENERGY</c>, gain {0} <c=status>FURY</c>."
         },
         "NeverendingRage": {
-            "name": "Neverending Rage",
+            "name": "neverending rage",
             "description": "The next time you would lose any amount of <c=status>FURY</c>, instead lose 1 neverending rage."
         },
         "Simmer": {
-            "name": "Simmer",
+            "name": "simmer",
             "description": "Gain {0} <c=status>FURY</c> every turn."
         },
         "Disarmed": {
-            "name": "Disarmed",
-            "description": "Attacks do nothing. <c=downside>Decreases by 1 at end of turn.</c>"
+            "name": "disarmed",
+            "description": "Attacks of {0} damage or less do nothing. <c=downside>Halves at end of turn, rounded down.</c>"
         },
         "FakeMissing1": {
-            "name": "Crewmate 1 is missing",
+            "name": "crewmate 1 is missing",
             "description": "The next {0} <c=white>Crewmate 1</c> cards you play do nothing."
         },
         "FakeMissing2": {
-            "name": "Crewmate 2 is missing",
+            "name": "crewmate 2 is missing",
             "description": "The next {0} <c=white>Crewmate 2</c> cards you play do nothing."
+        },
+
+        "CardFind": {
+            "name": "card find",
+            "description": "For each stack, at the end of combat, choose 1 of 3 cards to gain or skip."
+        },
+        "ArtifactFind": {
+            "name": "artifact find",
+            "description": "For each stack, at the end of combat, choose 1 of 2 artifacts to gain or skip."
         }
     },
     "trait": {
         "priority": {
-            "name": "Priority",
-            "description": "This card has two separate sets of actions. If only <c=cardtrait>priority</c> cards (or no cards) have been played this turn, the first set is played, <c=faint>otherwise the second set is played.",
-            "descriptionOff": "This card has two separate sets of actions. <c=faint>If only <c=cardtrait>priority</c> cards (or no cards) have been played this turn, the first set is played,</c> otherwise the second set is played."
+            "name": "priority",
+            "description": "When a non-<c=cardtrait>priority</c> card is played, the top action is disabled for the turn."
         },
         "fast": {
-            "name": "Fast",
+            "name": "fast",
             "description": "Doesn't break chains of <c=cardtrait>priority</c> cards."
+        },
+
+        "tiring": {
+            "name": "tiring",
+            "description": "Costs +1 <c=energy>energy</c> per zone you have completed this run."
+        },
+        "mundane": {
+            "name": "mundane",
+            "description": "This card is removed from your deck at the beginning of the final boss fight."
         }
     },
     "artifact": {
-        "PunchingBag": {
-            "name": "PUNCHING BAG",
-            "description": "Non-<c=dea0a0>Peaches</c> cards and non-card attacks ignore <c=status>DISARM</c>."
+        "Peaches": {
+            "PunchingBag": {
+                "name": "PUNCHING BAG",
+                "description": "Non-<c=dea0a0>Peaches</c> cards and non-card attacks ignore <c=status>DISARM</c>."
+            },
+            "YogaLessons": {
+                "name": "YOGA LESSONS",
+                "description": "Whenever you receive <c=status>SHIELD</c> or <c=status>TEMP SHIELD</c>, spend 1 <c=status>FURY</c> to increase the amount gained by 1."
+            },
+            "LifeSavings": {
+                "name": "LIFE SAVINGS",
+                "description": "Gain 1 extra <c=energy>ENERGY</c> every turn. <c=downside>If you ended your last turn with 0 energy, gain 1 <c=status>DISARM</c> and 1 less <c=energy>ENERGY</c>.</c>"
+            },
+            "PinaColada": {
+                "name": "PINA COLADA",
+                "description": "Missing crewmates' cards give 1 <c=status>SHIELD</c>."
+            },
+            "FramedPhotograph": {
+                "name": "FRAMED PHOTOGRAPH",
+                "description": "When your ship would lose all its hull, gain 1 <c=status>PERFECT SHIELD</c> and 7 <c=status>FURY</c>. <c=downside>Can only trigger once.</c>"
+            },
+            "Megaphone": {
+                "name": "MEGAPHONE",
+                "description": "Gain 1 extra <c=energy>ENERGY</c> every turn. <c=downside>Cards always cost at least 1 energy to play.</c>"
+            },
+            "BigGuns": {
+                "name": "BIG GUNS",
+                "description": "When you deal <c=damage>4+ damage</c> to an enemy part in a single hit, <c=action>stun</c> it. If you deal <c=damage>16+ damage</c>, <c=action>total stun</c> the enemy instead."
+            }
         },
-        "YogaLessons": {
-            "name": "YOGA LESSONS",
-            "description": "Whenever you receive <c=status>SHIELD</c> or <c=status>TEMP SHIELD</c>, spend 1 <c=status>FURY</c> to increase the amount gained by 1."
+        "Carrie": {
+            "Catalogue": {
+                "name": "CATALOGUE",
+                "description": "<c=keyword>+1 artifact option</c> in artifact offerings.\n<c=keyword>+1 card option</c> in card offerings."
+            },
+            "MultiTool": {
+                "name": "MULTI-TOOL",
+                "description": "Cards are <c=keyword>twice</c> as likely to appear upgraded in card offerings."
+            },
+            "SlowAndSteady": {
+                "name": "SLOW AND STEADY",
+                "description": "Draw a card whenever you play a <c=trash>trash</c> card. Enemies cannot gain <c=status>POWERDRIVE</c> or <c=status>SHIELD</c> during their turn."
+            },
+            "Forklift": {
+                "name": "FORKLIFT",
+                "description": "Whenever you play an <c=card>upgraded <c=cardtrait>single-use</c> card</c>, add an <c=card>unupgraded</c> copy to the discard pile. On pickup, choose a <c=cardtrait>single-use</c> card to upgrade."
+            },
+            "Package": {
+                "name": "PACKAGE",
+                "description": "On the <c=keyword>first turn of a boss fight</c>, add all packaged cards to your hand and remove this artifact. Cards currently packaged:"
+            },
+            "FairTrade": {
+                "name": "FAIR TRADE",
+                "description": "Spend 1 use at a <c=heal>repair yard</c> to get an extra service."
+            }
         },
-        "ForcedSoftwareUpdate": {
-            "name": "FORCED SOFTWARE UPDATE",
-            "description": "A <c=status>disarmed</c> attack instead gives 1 <c=status>FURY</c>."
-        },
-        "PriorityMail": {
-            "name": "PRIORITY MAIL",
-            "description": "The first card you play each turn is <c=cardtrait>fast</c>."
-        },
-        "FramedPhotograph": {
-            "name": "FRAMED PHOTOGRAPH",
-            "description": "When your ship would lose all its hull, lose all but one max hull instead, gain 1 <c=status>PERFECT SHIELD</c> and 7 <c=status>FURY</c>. <c=downside>Can only trigger once.</c>"
-        },
-        "SurveillanceDrones": {
-            "name": "SURVEILLANCE DRONES",
-            "description": "Whenever you spend any amount of <c=status>FURY</c>, gain as much <c=status>TEMP SHIELD</c>."
-        },
-        "BigGuns": {
-            "name": "BIG GUNS",
-            "description": "Gain 1 extra <c=energy>ENERGY</c> every turn. <c=downside>Cards always cost at least 1 energy to play.</c>"
+        "Duo": {
+            "SurveillanceDrones": {
+                "name": "SURVEILLANCE DRONES",
+                "description": "Whenever you spend any amount of <c=status>FURY</c>, gain as much <c=status>TEMP SHIELD</c>."
+            },
+            "ForcedSoftwareUpdate": {
+                "name": "FORCED SOFTWARE UPDATE",
+                "description": "A <c=status>disarmed</c> attack instead gives 1 <c=status>FURY</c>."
+            },
+            "PriorityMail": {
+                "name": "PRIORITY MAIL",
+                "description": "The first card you play each turn is <c=cardtrait>fast</c>."
+            }
         }
     },
     "card": {
-        "Anger": {
-            "name": "Anger"
-        },
-        "AngerManagement": {
-            "name": "Anger Control"
-        },
-        "BottleUp": {
-            "name": "Bottle Up",
-            "description": {
-                "None": "X = <c=status>fury</c>. Lose all <c=status>fury</c>. Add a <c=card>Break the Bottle</c> to your <c=keyword>hand</c>.",
-                "A": "X = <c=status>fury</c>. Lose all <c=status>fury</c>. Add a <c=card>Break the Bottle</c> to your <c=keyword>hand</c>, <c=cardtrait>discounted</c>.",
-                "B": "X = <c=status>fury</c>. Lose all <c=status>fury</c>. Add a <c=card>Break the Bottle B</c> to your <c=keyword>hand</c>."
-            }
-        },
-        "BreakTheBottle": {
-            "name": "Break the Bottle"
-        },
-        "Catharsis": {
-            "name": "Catharsis"
-        },
-        "Eruption": {
-            "name": "Eruption",
-            "description": {
-                "None": "Attack for <c=damage>{{Damage}}</c> damage. (Affected <c=keyword>twice</c> by damage increases.)",
-                "A": "Attack for <c=damage>{{Damage}}</c> damage. (Affected <c=keyword>twice</c> by damage increases.)",
-                "B": "Attack for <c=damage>{{Damage}}</c> damage. (Affected <c=keyword>thrice</c> by damage increases.)"
-            }
-        },
-        "Finisher": {
-            "name": "Finisher"
-        },
-        "FuckOff": {
-            "name": "Fuck Off!"
-        },
-        "HardWorker": {
-            "name": "Hard Worker"
-        },
-        "HellsFury": {
-            "name": "Hell's Fury"
-        },
-        "HitEm": {
-            "name": "Hit 'Em"
-        },
-        "LeaveAMessage": {
-            "name": "Leave A Message"
-        },
-        "LetMeAtEm": {
-            "name": "Let me at 'Em!"
-        },
-        "NeverendingRage": {
-            "name": "Neverending Rage"
-        },
-        "LetMeFinish": {
-            "name": "Let Me Finish"
-        },
-        "OverloadCannons": {
-            "name": "Overload Cannons"
-        },
-        "Overtime": {
-            "name": "Overtime",
-            "description": {
-                "None": {
-                    "priority": "Discard all <c=attack>attacking</c> cards and draw as many cards + 2<c=faint>/1</c>.",
-                    "noPriority": "Discard all <c=attack>attacking</c> cards and draw as many cards + <c=faint>2/</c>1."
-                },
-                "A": {
-                    "priority": "Discard all attacking cards and draw as many cards + 3<c=faint>/2</c>.",
-                    "noPriority": "Discard all attacking cards and draw as many cards + <c=faint>3/</c>2."
-                },
-                "B": {
-                    "priority": "Discard all attacking cards and draw as many cards + 2<c=faint>/1</c>.",
-                    "noPriority": "Discard all attacking cards and draw as many cards + <c=faint>2/</c>1."
+        "Peaches": {
+            "Ire": {
+                "name": "Ire"
+            },
+            "Resentment": {
+                "name": "Resentment"
+            },
+            "BottleUp": {
+                "name": "Bottle Up",
+                "description": {
+                    "None": "X = <c=status>fury</c>. Lose all <c=status>fury</c>. Add a <c=card>Break the Bottle</c> to your <c=keyword>discard pile</c>.",
+                    "A": "X = <c=status>fury</c>. Lose all <c=status>fury</c>. Add a <c=card>Break the Bottle A</c> to your <c=keyword>discard pile</c>.",
+                    "B": "X = <c=status>fury</c>. Lose all <c=status>fury</c>. Add a <c=card>Break the Bottle B</c> to your <c=keyword>hand</c>."
+                }
+            },
+            "BreakTheBottle": {
+                "name": "Break the Bottle"
+            },
+            "Catharsis": {
+                "name": "Catharsis"
+            },
+            "PassiveAggression": {
+                "name": "Passive Aggression"
+            },
+            "Finisher": {
+                "name": "Catharsis"
+            },
+            "FuckOff": {
+                "name": "Fuck Off!"
+            },
+            "HardWorker": {
+                "name": "Hard Worker"
+            },
+            "Snap": {
+                "name": "Snap"
+            },
+            "HitEm": {
+                "name": "Hit 'Em"
+            },
+            "TriflingMatters": {
+                "name": "Trifling Matters"
+            },
+            "LetMeAtEm": {
+                "name": "Let me at 'Em!"
+            },
+            "NeverendingRage": {
+                "name": "Neverending Rage"
+            },
+            "LetMeFinish": {
+                "name": "Let Me Finish"
+            },
+            "OverloadCannons": {
+                "name": "Overload Cannons"
+            },
+            "Overwork": {
+                "name": "Overwork",
+                "description": {
+                    "None": {
+                        "priority": "Discard all <c=attack>attacking</c> cards and draw as many cards + 2<c=faint>/1</c>.",
+                        "noPriority": "Discard all <c=attack>attacking</c> cards and draw as many cards + <c=faint>2/</c>1."
+                    },
+                    "A": {
+                        "priority": "Discard all attacking cards and draw as many cards + 3<c=faint>/2</c>.",
+                        "noPriority": "Discard all attacking cards and draw as many cards + <c=faint>3/</c>2."
+                    },
+                    "B": {
+                        "priority": "Discard all attacking cards and draw as many cards + 2<c=faint>/1</c>.",
+                        "noPriority": "Discard all attacking cards and draw as many cards + <c=faint>2/</c>1."
+                    }
+                }
+            },
+            "Simmer": {
+                "name": "Simmer"
+            },
+            "SmashControls": {
+                "name": "Smash Controls"
+            },
+            "PlatonicShot": {
+                "name": "Platonic Shot"
+            },
+            "Veer": {
+                "name": "Veer"
+            },
+            "TheCalm": {
+                "name": "The Calm",
+                "description": {
+                    "None": "X = <c=status>disarm</c>. Add <c=card>The Storm</c> to your <c=keyword>draw pile</c>.",
+                    "A": "X = <c=status>disarm</c>. Add <c=card>The Storm A</c> to your <c=keyword>draw pile</c>.",
+                    "B": "X = <c=status>disarm</c>. Lose all disarm. Add <c=card>The Storm</c> to your <c=keyword>draw pile</c>."
+                }
+            },
+            "TheStorm": {
+                "name": "The Storm"
+            },
+            "ViolentDaydreams": {
+                "name": "Violent Daydreams",
+                "description": {
+                    "None": "Gain 1 <c=status>disarm</c>. Draw all <c=action>attacking</c> cards from the <c=keyword>draw pile</c>.",
+                    "A": "Gain 1 <c=status>disarm</c> and 1 <c=energy>energy</c>. Draw all <c=action>attacking</c> cards from the <c=keyword>draw pile</c>.",
+                    "B": "Draw all <c=action>attacking</c> cards from the <c=keyword>draw pile</c>."
+                }
+            },
+            "WhereItHurts": {
+                "name": "Where It Hurts",
+                "description": {
+                    "None": "Gain {{Amount}} <c=status>evade.</c> Random enemy part becomes <c=parttrait>brittle</c> until hit.",
+                    "A": "Gain {{Amount}} <c=status>evade.</c> Random enemy part becomes <c=parttrait>brittle</c> until hit.",
+                    "B": "Gain {{Amount}} <c=status>evade.</c> Two random enemy parts become <c=downside>secretly</c> <c=parttrait>brittle</c> until hit."
+                }
+            },
+            "YouCantHide": {
+                "name": "You Can't Hide!"
+            },
+            "YoureFired": {
+                "name": "You're Fired!",
+                "tooltip": {
+                    "desc": "<c=action>X</c> = your total amount of {{Text}} combined{{Count}}.",
+                    "segment": "<c={{Color}}>{{Character}}</c> cards",
+                    "delimiter": ", ",
+                    "delimiterFinal": " and ",
+                    "placeholder": "crewmate {{Number}}"
                 }
             }
         },
-        "Simmer": {
-            "name": "Simmer"
-        },
-        "SmashControls": {
-            "name": "Smash Controls"
-        },
-        "SurpriseShot": {
-            "name": "Surprise Shot"
-        },
-        "Swerve": {
-            "name": "Swerve"
-        },
-        "TheCalm": {
-            "name": "The Calm",
-            "description": {
-                "None": {
-                    "priority": "Gain 3<c=faint>/5</c> <c=status>disarm</c>. Add <c=card>The Storm</c> to your <c=keyword>discard pile</c>.",
-                    "noPriority": "Gain <c=faint>3/</c>5 <c=status>disarm</c>. Add <c=card>The Storm</c> to your <c=keyword>discard pile</c>."
-                },
-                "A": {
-                    "priority": "Gain 3<c=faint>/5</c> <c=status>disarm</c>. Add <c=card>The Storm A</c> to your <c=keyword>discard pile</c>.",
-                    "noPriority": "Gain <c=faint>3/</c>5 <c=status>disarm</c>. Add <c=card>The Storm A</c> to your <c=keyword>discard pile</c>."
-                },
-                "B": {
-                    "priority": "Gain 2<c=faint>/4</c> <c=status>disarm</c>. Add <c=card>The Storm</c> to your <c=keyword>discard pile</c>.",
-                    "noPriority": "Gain <c=faint>2/</c>4 <c=status>disarm</c>. Add <c=card>The Storm</c> to your <c=keyword>discard pile</c>."
+        "Carrie": {
+            "ClockIn": {
+                "name": "Clock In"
+            },
+            "Scrounge": {
+                "name": "Scrounge"
+            },
+            "SafetyMeasures": {
+                "name": "Safety Measures"
+            },
+            "SmokeBreak": {
+                "name": "Smoke Break"
+            },
+            "Package": {
+                "name": "Package",
+                "description": {
+                    "A": "Remove up to 3 cards in hand. Put them into a <c=artifact>package</c>.",
+                    "B": "Remove a card in hand.",
+                    "None": "Remove a card in hand. Put it into a <c=artifact>package</c>."
                 }
-            }
-        },
-        "TheStorm": {
-            "name": "The Storm"
-        },
-        "ViolentDaydreams": {
-            "name": "Violent Daydreams",
-            "description": {
-                "None": "Gain 1 <c=status>disarm</c>. Draw all <c=action>attacking</c> cards from the <c=keyword>draw pile</c>.",
-                "A": "Gain 1 <c=status>disarm</c> and 1 <c=energy>energy</c>. Draw all <c=action>attacking</c> cards from the <c=keyword>draw pile</c>.",
-                "B": "Draw all <c=action>attacking</c> cards from the <c=keyword>draw pile</c>."
-            }
-        },
-        "WhereItHurts": {
-            "name": "Where It Hurts",
-            "description": {
-                "None": {
-                    "priority": "Random enemy part becomes <c=parttrait>brittle</c><c=faint>/weak</c> until hit.",
-                    "noPriority": "Random enemy part becomes <c=faint>brittle/</c><c=parttrait>weak</c> until hit."
+            },
+            "Retrieve": {
+                "name": "Retrieve",
+                "description": "Gain {{Amount}} <c=energy>energy</c>. Choose a card in your <c=keyword>draw pile</c> to draw"
+            },
+            "FixerUpper": {
+                "name": "Fixer Upper"
+            },
+            "Unboxing": {
+                "name": "Unboxing",
+                "description": {
+                    "A": "Add 1 of {{Amount}} upgraded cards to hand.",
+                    "None": "Add 1 of {{Amount}} unupgraded cards to hand."
+                }
+            },
+            "Repurpose": {
+                "name": "Repurpose"
+            },
+            "MadeToLast": {
+                "name": "Made To Last",
+                "description": {
+                    "A": "Remove <c=cardtrait>temp</c> from all cards in hand.",
+                    "B": "Remove <c=cardtrait>temp</c> from a card in hand.",
+                    "None": "Remove <c=cardtrait>temp</c> from a card in hand."
+                }
+            },
+            "TearDown": {
+                "name": "Tear Down",
+                "description": {
+                    "A": "<c=downside>Unupgrade</c> a card in hand. Gain 2 <c=card>Reimburses</c>.",
+                    "B": "Upgrade a card in hand.",
+                    "None": "<c=downside>Unupgrade a card in hand. Gain a <c=card>Reimburse</c>."
+                }
+            },
+            "Reimburse": {
+                "name": "Reimburse",
+                "description": {
+                    "A": "Upgrade your hand randomly.",
+                    "B": "Duplicate a card in hand.",
+                    "None": "Upgrade a card in hand."
+                }
+            },
+            "Detour": {
+                "name": "Detour"
+            },
+            "Trade": {
+                "name": "Trade",
+                "description": {
+                    "A": "Choose an <c=artifact>artifact</c> to remove. Gain 2 <c=card>Fair Trades</c>.",
+                    "B": "Choose an <c=artifact>artifact</c> to remove. Gain 1 <c=tatus>ARTIFACT FIND</c>.",
+                    "None": "Choose an <c=artifact>artifact</c> to remove. Gain a <c=card>Fair Trade</c>."
                 },
-                "A": {
-                    "priority": "Gain 1 <c=status>fury</c>.\nRandom enemy part becomes <c=parttrait>brittle</c><c=faint>/weak</c> until hit.",
-                    "noPriority": "Gain 1 <c=status>fury</c>.\nRandom enemy part becomes <c=faint>brittle/</c><c=parttrait>weak</c> until hit."
+                "ui": {
+                    "cancel": "CANCEL"
+                }
+            },
+            "PushThrough": {
+                "name": "Push Through",
+                "description": "Shoot for <c=damage>{{Damage}}</c> dmg. <c=downside>-4 per completed zone this run."
+            },
+            "FullEffort": {
+                "name": "Full Effort",
+                "description": {
+                    "A": "Randomly upgrade all <c=cardtrait>temp</c> cards.",
+                    "B": "Choose a <c=cardtrait>temp</c> card in hand to upgrade.",
+                    "None": "Choose a <c=cardtrait>temp</c> card in hand to upgrade."
+                }
+            },
+            "Unshakable": {
+                "name": "Unshakable"
+            },
+            "SpecialDelivery": {
+                "name": "Special Delivery",
+                "description": {
+                    "A": "Gain 1 <c=status>EXTRA ARTIFACT</c>.",
+                    "B": "Gain 2 <c=status>EXTRA ARTIFACT</c> <c=downside>and 2 <c=card>Delivery Boxes</c>.</c>",
+                    "None": "Gain 1 <c=status>EXTRA ARTIFACT</c> <c=downside>and a <c=card>Delivery Box</c>.</c>"
+                }
+            },
+            "DeliveryBox": {
+                "name": "Delivery Box"
+            },
+            "HaulAss": {
+                "name": "Haul Ass!",
+                "description": {
+                    "A": "Leave combat, keep <c=cardtrait>temp</c> cards.",
+                    "B": "Leave combat, keep <c=cardtrait>temp</c> cards, <c=downside>skip rewards.</c>",
+                    "None": "Leave combat, keep <c=cardtrait>temp</c> cards, <c=downside>skip rewards.</c>"
+                }
+            },
+            "ClockOut": {
+                "name": "Clock Out",
+                "description": {
+                    "A": "Remove <c=464764>Carrie</c>. Gain 1 of {{Amount}} crewmates + <c=card>starters</c>.",
+                    "B": "Remove <c=464764>Carrie</c>. Gain 1 of {{Amount}} crewmates + <c=card>upgraded starters</c>.",
+                    "None": "Remove <c=464764>Carrie</c>. Gain 1 of {{Amount}} crewmates + <c=card>starters</c>."
                 },
-                "B": "Two random enemy parts become <c=downside>secretly</c> <c=parttrait>brittle</c> until hit."
-            }
-        },
-        "YouCantHide": {
-            "name": "You Can't Hide!"
-        },
-        "YoureFired": {
-            "name": "You're Fired!",
-            "tooltip": {
-                "desc": "<c=action>X</c> = your total amount of {{Text}} combined{{Count}}.",
-                "segment": "<c={{Color}}>{{Character}}</c> cards",
-                "delimiter": ", ",
-                "delimiterFinal": " and ",
-                "placeholder": "crewmate {{Number}}"
+                "choiceText": "Choose a crew member"
+            },
+            "ElbowGrease": {
+                "name": "Elbow Grease",
+                "description": {
+                    "A": "Make a card in hand <c=cardtrait>buoyant</c> forever.",
+                    "B": "Make a card in hand <c=cardtrait>buoyant</c> and <c=cardtrait>retain</c> forever. <c=downside>-2 max hull.</c>",
+                    "None": "Make a card in hand <c=cardtrait>buoyant</c> forever. <c=downside>-2 max hull.</c>"
+                },
+                "showCardText": "Added <c=cardtrait>buoyant</c> and <c=cardtrait>retain</c>!",
+                "cardSelectText": "Choose a card to add <c=cardtrait>buoyant</c> and <c=cardtrait>retain</c> to, forever."
+            },
+            "BestOfTheBest": {
+                "name": "Best of the Best"
             }
         }
     }

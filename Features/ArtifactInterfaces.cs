@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HarmonyLib;
-using TheJazMaster.Peaches.Artifacts;
+using TheJazMaster.UnseenEffort.Artifacts;
 
-namespace TheJazMaster.Peaches.Features;
+namespace TheJazMaster.UnseenEffort.Features;
 
 public class ArtifactInterfacesManager
 {

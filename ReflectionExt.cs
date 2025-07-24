@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.Loader;
 
-namespace TheJazMaster.Peaches;
+namespace TheJazMaster.UnseenEffort;
 
 public static class ReflectionExt
 {

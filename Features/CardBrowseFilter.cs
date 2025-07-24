@@ -8,9 +8,9 @@ using HarmonyLib;
 using System.Reflection.Emit;
 using System.Reflection;
 
-namespace TheJazMaster.Peaches.Features;
-#nullable enable
+namespace TheJazMaster.UnseenEffort.Features;
 
+[HarmonyPatch]
 public class CardBrowseFilterManager
 {
 	static ModEntry Instance => ModEntry.Instance;
@@ -20,21 +20,11 @@ public class CardBrowseFilterManager
 
     internal const string FilterPriorityKey = "FilterPriority";
     internal const string FilterFastKey = "FilterFast";
+    internal const string FilterSingleUse = "SingleUse";
+    internal const string FilterNoUpgrade = "NoUpgrade";
 
-    public CardBrowseFilterManager()
-    {
-        Harmony.TryPatch(
-		    logger: Instance.Logger,
-		    original: AccessTools.DeclaredMethod(typeof(ACardSelect), nameof(ACardSelect.BeginWithRoute)),
-			transpiler: new HarmonyMethod(GetType(), nameof(ACardSelect_BeginWithRoute_Transpiler))
-		);
-        Harmony.TryPatch(
-		    logger: Instance.Logger,
-		    original: AccessTools.DeclaredMethod(typeof(CardBrowse), nameof(CardBrowse.GetCardList)),
-			postfix: new HarmonyMethod(GetType(), nameof(CardBrowse_GetCardList_Postfix))
-		);
-    }
-
+    [HarmonyTranspiler]
+    [HarmonyPatch(typeof(ACardSelect), nameof(ACardSelect.BeginWithRoute))]
     private static IEnumerable<CodeInstruction> ACardSelect_BeginWithRoute_Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator il, MethodBase originalMethod)
     {
         return new SequenceBlockMatcher<CodeInstruction>(instructions)
@@ -57,15 +47,25 @@ public class CardBrowseFilterManager
 
         if (ModData.TryGetModData<bool>(cardSelect, FilterPriorityKey, out var filterPriority))
             ModData.SetModData(cardBrowse, FilterPriorityKey, filterPriority);
+
+        if (ModData.TryGetModData<bool>(cardSelect, FilterSingleUse, out var filterSingleUse))
+            ModData.SetModData(cardBrowse, FilterSingleUse, filterSingleUse);
+
+        if (ModData.TryGetModData<Upgrade>(cardSelect, FilterNoUpgrade, out var filterNoUpgrade))
+            ModData.SetModData(cardBrowse, FilterNoUpgrade, filterNoUpgrade);
     }
 
 
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(CardBrowse), nameof(CardBrowse.GetCardList))]
     private static void CardBrowse_GetCardList_Postfix(CardBrowse __instance, ref List<Card> __result, G g)
     {
         bool doesFilterFast = ModData.TryGetModData(__instance, FilterFastKey, out bool filterFast);
         bool doesFilterPriority = ModData.TryGetModData(__instance, FilterPriorityKey, out bool filterPriority);
+        bool doesFilterSingleUse = ModData.TryGetModData(__instance, FilterSingleUse, out bool filterSingleUse);
+        bool doesFilterNoUpgrade = ModData.TryGetModData(__instance, FilterNoUpgrade, out Upgrade filterNoUpgrade);
         Combat combat = g.state.route as Combat ?? DB.fakeCombat;
-        if ((doesFilterFast || doesFilterPriority) && __instance.browseSource != CardBrowse.Source.Codex) {
+        if ((doesFilterFast || doesFilterPriority || doesFilterNoUpgrade) && __instance.browseSource != CardBrowse.Source.Codex) {
             __result.RemoveAll(delegate(Card c)
             {
                 CardData data = c.GetDataWithOverrides(g.state);
@@ -77,6 +77,16 @@ public class CardBrowseFilterManager
 
                 if (doesFilterPriority) {
                     if (CardsHelper.IsCardTraitActive(g.state, c, PriorityManager.PriorityTrait) != filterPriority)
+                        return true;
+                }
+
+                if (doesFilterSingleUse) {
+                    if (CardsHelper.IsCardTraitActive(g.state, c, CardsHelper.SingleUseCardTrait) != filterSingleUse)
+                        return true;
+                }
+
+                if (doesFilterNoUpgrade) {
+                    if (c.upgrade == filterNoUpgrade)
                         return true;
                 }
 

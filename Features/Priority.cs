@@ -12,8 +12,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Xna.Framework.Input.Touch;
 using System.Globalization;
 
-namespace TheJazMaster.Peaches.Features;
-#nullable enable
+namespace TheJazMaster.UnseenEffort.Features;
 
 public class PriorityManager
 {
@@ -21,7 +20,7 @@ public class PriorityManager
     static IModHelper Helper => Instance.Helper;
     static IModData ModData => Helper.ModData;
     static readonly string RuinedPriorityKey = "RuinedPriority";
-    static readonly string RenderPriorityFlippedKey = "RenderPriorityFlipped";
+    // static readonly string RenderPriorityFlippedKey = "RenderPriorityFlipped";
 
     internal static ICardTraitEntry PriorityTrait { get; private set; } = null!;
     internal static ICardTraitEntry FastTrait { get; private set; } = null!;
@@ -35,16 +34,16 @@ public class PriorityManager
         PriorityTrait = ModEntry.Instance.Helper.Content.Cards.RegisterTrait("Priority", new() {
             Icon = (state, card) => HasRuinedPriority(state, card) ? PriorityOffIcon : PriorityIcon,
             Name = ModEntry.Instance.AnyLocalizations.Bind(["trait", "priority"]).Localize,
-            Tooltips = (state, card) => [ HasRuinedPriority(state, card) ?
-                new GlossaryTooltip($"trait.{GetType().Namespace!}::Priority") {
-                    Icon = PriorityOffIcon,
-                    TitleColor = Colors.action,
-                    Title = ModEntry.Instance.Localizations.Localize(["trait", "priority", "name"]),
-                    Description = ModEntry.Instance.Localizations.Localize(["trait", "priority", "descriptionOff"]),
-                } :
+            Tooltips = (state, card) => [ //HasRuinedPriority(state, card) ?
+                // new GlossaryTooltip($"trait.{GetType().Namespace!}::Priority") {
+                //     Icon = PriorityOffIcon,
+                //     TitleColor = Colors.action,
+                //     Title = ModEntry.Instance.Localizations.Localize(["trait", "priority", "name"]),
+                //     Description = ModEntry.Instance.Localizations.Localize(["trait", "priority", "descriptionOff"]),
+                // } :
                 new GlossaryTooltip($"trait.{GetType().Namespace!}::Priority") {
                     Icon = PriorityIcon,
-                    TitleColor = Colors.action,
+                    TitleColor = Colors.cardtrait,
                     Title = ModEntry.Instance.Localizations.Localize(["trait", "priority", "name"]),
                     Description = ModEntry.Instance.Localizations.Localize(["trait", "priority", "description"]),
                 }
@@ -57,7 +56,7 @@ public class PriorityManager
             Tooltips = (_, _) => [
                 new GlossaryTooltip($"trait.{GetType().Namespace!}::Fast") {
                     Icon = FastIcon,
-                    TitleColor = Colors.action,
+                    TitleColor = Colors.cardtrait,
                     Title = ModEntry.Instance.Localizations.Localize(["trait", "fast", "name"]),
                     Description = ModEntry.Instance.Localizations.Localize(["trait", "fast", "description"]),
                 },
@@ -80,20 +79,20 @@ public class PriorityManager
 		    original: AccessTools.DeclaredMethod(typeof(Combat), nameof(Combat.TryPlayCard)),
 			postfix: new HarmonyMethod(GetType(), nameof(Combat_TryPlayCard_Postfix))
 		);
-        Instance.Harmony.TryPatch(
-		    logger: ModEntry.Instance.Logger,
-		    original: AccessTools.DeclaredMethod(typeof(CardReward), nameof(CardReward.Render)),
-			postfix: new HarmonyMethod(GetType(), nameof(CardReward_Render_Postfix))
-		);
+        // Instance.Harmony.TryPatch(
+		//     logger: ModEntry.Instance.Logger,
+		//     original: AccessTools.DeclaredMethod(typeof(CardReward), nameof(CardReward.Render)),
+		// 	postfix: new HarmonyMethod(GetType(), nameof(CardReward_Render_Postfix))
+		// );
     }
 
     internal static bool HasRuinedPriority(State state, Card? card) {
-        if (state == DB.fakeState) {
-            if (card != null && Helper.ModData.TryGetModData(card, RenderPriorityFlippedKey, out bool data)) {
-                return data;
-            }
-            return false;
-        }
+        // if (state == DB.fakeState) {
+        //     if (card != null && Helper.ModData.TryGetModData(card, RenderPriorityFlippedKey, out bool data)) {
+        //         return data;
+        //     }
+        //     return false;
+        // }
         return state.route is Combat c && ModData.TryGetModData(c, RuinedPriorityKey, out bool has) && has;
     }
 
@@ -106,29 +105,25 @@ public class PriorityManager
             ModData.SetModData(__instance, RuinedPriorityKey, true);
     }
 
-    internal static List<CardAction> PrioritySet(State s, Card card, List<CardAction> first, List<CardAction> second) {
+    internal static List<CardAction> PrioritySet(State s, Card card, CardAction first, List<CardAction> second) {
         if (HasRuinedPriority(s, card)) {
-            foreach (CardAction action in first)
-                action.disabled = true;
+            first.disabled = true;
         }
-        else {
-            foreach (CardAction action in second)
-                action.disabled = true;
-        }
-        return [.. first.Concat([new ADummyAction()]), .. second];
+        
+        return [first, new ADummyAction(), .. second];
     }
 
-    private static Route? lastCardReward;
-    private static void CardReward_Render_Postfix(G g, CardReward __instance)  {
-        lastCardReward = __instance;
-		if (__instance.flipFloppableCardsTimer > 3.0) {
-			foreach (Card card in __instance.cards)
-			{
-				if (Helper.Content.Cards.IsCardTraitActive(g.state, card, PriorityTrait)) {
-					Helper.ModData.SetModData(card, RenderPriorityFlippedKey, !Helper.ModData.GetModDataOrDefault(card, RenderPriorityFlippedKey, false));
-					card.flipAnim = 1.0;
-				}
-			}
-		}
-    }
+    // private static Route? lastCardReward;
+    // private static void CardReward_Render_Postfix(G g, CardReward __instance)  {
+    //     lastCardReward = __instance;
+	// 	if (__instance.flipFloppableCardsTimer > 3.0) {
+	// 		foreach (Card card in __instance.cards)
+	// 		{
+	// 			if (Helper.Content.Cards.IsCardTraitActive(g.state, card, PriorityTrait)) {
+	// 				Helper.ModData.SetModData(card, RenderPriorityFlippedKey, !Helper.ModData.GetModDataOrDefault(card, RenderPriorityFlippedKey, false));
+	// 				card.flipAnim = 1.0;
+	// 			}
+	// 		}
+	// 	}
+    // }
 }

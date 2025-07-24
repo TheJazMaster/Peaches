@@ -1,4 +1,4 @@
-namespace TheJazMaster.Peaches.Artifacts;
+namespace TheJazMaster.UnseenEffort.Artifacts;
 
 public interface IOnSurviveArtifact
 {

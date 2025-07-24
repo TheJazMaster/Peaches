@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<RootNamespace>TheJazMaster.UnseenEffort</RootNamespace>
+		<Nullable>enable</Nullable>
+		
+		<TargetFramework>net8.0</TargetFramework>
+		<ModZipPath>$(MSBuildProjectDirectory)\.release\$(MSBuildProjectName)-$(Version).zip</ModZipPath>
+
+		<ModLoaderPath>..\..</ModLoaderPath>
+		<GameExePath>/home/thejazmaster/.steam/steam/steamapps/common/Cobalt Core/CobaltCore.exe</GameExePath>
+		<GameDllPath>$(ModLoaderPath)/Extract/CobaltCore.dll</GameDllPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ModFiles Include="I18n/**" />
+		<ModFiles Include="Sprites/**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Nickel.ModBuildConfig" Version="2.0.2" />
+		<PackageReference Include="EnumByNameSourceGenerator" Version="1.1.2" PrivateAssets="All" ExcludeAssets="runtime" />
+	</ItemGroup>
+</Project>

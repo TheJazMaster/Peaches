@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using TheJazMaster.Peaches.Cards;
+using TheJazMaster.UnseenEffort.Cards;
+using TheJazMaster.UnseenEffort.Cards.Peaches;
 
-namespace TheJazMaster.Peaches.Actions;
+namespace TheJazMaster.UnseenEffort.Actions;
 
 public class AVariableHintCards : AVariableHint
 {
@@ -15,15 +16,15 @@ public class AVariableHintCards : AVariableHint
     }
 
     public override Icon? GetIcon(State s) {
-        return new Icon(ModEntry.Instance.WorkforceIcon.Sprite, null, Colors.textMain);
+        return new Icon(ModEntry.Instance.WorkforceIcon, null, Colors.textMain);
     }
 
 	public override List<Tooltip> GetTooltips(State s)
 	{
 		List<Tooltip> tooltips = [];
 
-        string delimiter = Instance.Localizations.Localize(["card", "YoureFired", "tooltip", "delimiter"]);
-        string delimiterFinal = Instance.Localizations.Localize(["card", "YoureFired", "tooltip", "delimiterFinal"]);
+        string delimiter = Instance.Localizations.Localize(["card", "Peaches", "YoureFired", "tooltip", "delimiter"]);
+        string delimiterFinal = Instance.Localizations.Localize(["card", "Peaches", "YoureFired", "tooltip", "delimiterFinal"]);
 
         DefaultInterpolatedStringHandler stringHandler = new(22, 1);
 				
@@ -45,7 +46,7 @@ public class AVariableHintCards : AVariableHint
                     deckColors.Add(DB.decks[character.deckType.Value].color);
                 }
             }
-            cards = YoureFiredCard.CountNonPeachesCards(s.route is Combat c ? c : null);
+            cards = YoureFiredCard.CountNonPeachesCards(s.route as Combat ?? null);
         }
 
         for (int i = 0; i < deckNames.Count; i++) {

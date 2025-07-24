@@ -1,14 +1,18 @@
 {
-    "UniqueName": "TheJazMaster.Peaches",
-    "Version": "0.4.3",
-    "DisplayName": "Peaches, your supervisor",
+    "UniqueName": "TheJazMaster.UnseenEffort",
+    "Version": "0.9.4",
+    "DisplayName": "Unseen Effort",
     "RequiredApiVersion": "0.1.0",
-    "EntryPointAssembly": "Peaches.dll",
+    "EntryPointAssembly": "UnseenEffort.dll",
     "LoadPhase": "AfterDbInit",
     "Dependencies": [
         {
             "UniqueName": "Shockah.Kokoro",
             "Version": "1.2.0"
+        },
+        {
+            "UniqueName": "Nickel.Essentials",
+            "isRequired": false
         },
         {
             "UniqueName": "TheJazMaster.MoreDifficulties",

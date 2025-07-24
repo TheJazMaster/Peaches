@@ -4,127 +4,154 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Xna.Framework.Graphics;
 using Nanoray.PluginManager;
 using Nickel;
+using Nickel.Essentials;
+using Shockah.Kokoro;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using TheJazMaster.Peaches.Artifacts;
-using TheJazMaster.Peaches.Cards;
-using TheJazMaster.Peaches.Features;
+using TheJazMaster.UnseenEffort.Artifacts;
+using TheJazMaster.UnseenEffort.Artifacts.Carrie;
+using TheJazMaster.UnseenEffort.Artifacts.Peaches;
+using TheJazMaster.UnseenEffort.Cards;
+using TheJazMaster.UnseenEffort.Cards.Carrie;
+using TheJazMaster.UnseenEffort.Cards.Peaches;
+using TheJazMaster.UnseenEffort.Features;
 using MGColor = Microsoft.Xna.Framework.Color;
 
-namespace TheJazMaster.Peaches;
+namespace TheJazMaster.UnseenEffort;
 
 public sealed class ModEntry : SimpleMod {
-    internal static ModEntry Instance { get; private set; } = null;
+    internal static ModEntry Instance { get; private set; } = null!;
 
     internal Harmony Harmony { get; }
-	internal IKokoroApi KokoroApi { get; }
-	internal IMoreDifficultiesApi MoreDifficultiesApi { get; }
+	internal IEssentialsApi? EssentialsApi { get; }
+	internal IKokoroApi.IV2 KokoroApi { get; }
+	internal IMoreDifficultiesApi? MoreDifficultiesApi { get; }
 	internal SingleDamModManager SingleBrittleManager { get; }
 	internal SingleDamModManager SingleWeakManager { get; }
 	internal ILocalizationProvider<IReadOnlyList<string>> AnyLocalizations { get; }
 	internal ILocaleBoundNonNullLocalizationProvider<IReadOnlyList<string>> Localizations { get; }
 
+
+	// PEACHES DEFINITIONS
     internal IPlayableCharacterEntryV2 PeachesCharacter { get; }
+	internal Deck PeachesDeck { get; }
 
-    internal IDeckEntry PeachesDeck { get; }
+	internal Status FuryStatus { get; }
+	internal Status HardWorkerStatus { get; }
+    internal Status DisarmedStatus { get; }
 
-	internal IStatusEntry BideStatus { get; }
-	internal IStatusEntry HardWorkerStatus { get; }
-    internal IStatusEntry DisarmedStatus { get; }
-    internal IStatusEntry SimmerStatus { get; }
+    internal Status FakeMissing1Status { get; }
+    internal Status FakeMissing2Status { get; }
 
-    internal IStatusEntry FakeMissing1Status { get; }
-    internal IStatusEntry FakeMissing2Status { get; }
+    internal Spr WorkforceIcon { get; }
+    internal Spr DrawAttacksIcon { get; }
+	internal Spr SecretBrittleIcon { get; }
+	internal Spr SingleBrittleIcon { get; }
+	internal Spr SecretSingleBrittleIcon { get; }
 
-    internal ISpriteEntry PeachesPortrait { get; }
-    internal ISpriteEntry PeachesPortraitMini { get; }
-    internal ISpriteEntry PeachesFrame { get; }
-    internal ISpriteEntry PeachesCardBorder { get; }
-
-    internal ISpriteEntry WorkforceIcon { get; }
-    internal ISpriteEntry DrawAttacksIcon { get; }
-
-    internal Spr BottleUpArt { get; }
-
-    internal static IReadOnlyList<Type> StarterCardTypes { get; } = [
+	internal static IReadOnlyList<Type> PeachesCards { get; } = [
 		typeof(HitEmCard),
 		typeof(WhereItHurtsCard),
-	];
-
-	internal static IReadOnlyList<Type> CommonCardTypes { get; } = [
-		typeof(SwerveCard),
+		typeof(ResentmentCard),
+		typeof(PlatonicShotCard),
+		typeof(VeerCard),
 		typeof(SimmerCard),
-		typeof(CatharsisCard),
-		typeof(AngerManagementCard),
-		typeof(SurpriseShotCard),
-		typeof(AngerCard),
-        typeof(HellsFuryCard),
-	];
+		typeof(FinisherCard),
+		typeof(IreCard),
+        typeof(SnapCard),
 
-	internal static IReadOnlyList<Type> UncommonCardTypes { get; } = [
-		typeof(OvertimeCard),
+		typeof(OverworkCard),
 		typeof(BottleUpCard),
 		typeof(ViolentDaydreamsCard),
 		typeof(SmashControlsCard),
 		typeof(YouCantHideCard),
-		typeof(LeaveAMessageCard),
+		typeof(TriflingMattersCard),
 		typeof(LetMeAtEmCard),
-	];
-
-	internal static IReadOnlyList<Type> RareCardTypes { get; } = [
+	
 		typeof(FuckOffCard),
 		typeof(HardWorkerCard),
 		typeof(TheCalmCard),
 		typeof(YoureFiredCard),
-		typeof(EruptionCard),
-	];
-
-	internal static IReadOnlyList<Type> SecretCardTypes { get; } = [
+		typeof(PassiveAggressionCard),
+	
 		typeof(TheStormCard),
 		typeof(BreakTheBottleCard),
 	];
 
-    internal static IEnumerable<Type> AllCardTypes
-		=> StarterCardTypes
-			.Concat(CommonCardTypes)
-			.Concat(UncommonCardTypes)
-			.Concat(RareCardTypes)
-			.Concat(SecretCardTypes);
-
-    internal static IReadOnlyList<Type> CommonArtifacts { get; } = [
-		typeof(FramedPhotograph),
-		typeof(ForcedSoftwareUpdate),
-		typeof(PunchingBag),
-		typeof(PriorityMail),
+    internal static IReadOnlyList<Type> PeachesArtifacts { get; } = [
+		typeof(FramedPhotographArtifact),
+		typeof(PinaColadaArtifact),
+		typeof(LifeSavingsArtifact),
+		typeof(PunchingBagArtifact),
+	
+		typeof(BigGunsArtifact),
+		typeof(MegaphoneArtifact),
 	];
 
-	internal static IReadOnlyList<Type> BossArtifacts { get; } = [
-		typeof(BigGuns),
-		typeof(SurveillanceDrones),
+
+	// CARRIE DEFINITIONS
+    internal IPlayableCharacterEntryV2 CarrieCharacter { get; }
+	internal Deck CarrieDeck { get; }
+
+	internal Status CardFindStatus { get; }
+	internal Status ArtifactFindStatus { get; }
+    internal Status DetourStatus { get; }
+	internal Status DetourPlusStatus { get; }
+
+	internal static IReadOnlyList<Type> CarrieCards { get; } = [
+		typeof(ClockInCard),
+		typeof(ScroungeCard),
+		typeof(SafetyMeasuresCard),
+		typeof(SmokeBreakCard),
+		typeof(PackageCard),
+		typeof(RetrieveCard),
+		typeof(FixerUpperCard),
+        typeof(UnboxingCard),
+		typeof(RepurposeCard),
+
+		typeof(MadeToLastCard),
+		typeof(TearDownCard),
+		typeof(DetourCard),
+		typeof(TradeCard),
+		typeof(PushThroughCard),
+		typeof(FullEffortCard),
+		typeof(UnshakeableCard),
+	
+		typeof(SpecialDeliveryCard),
+		typeof(HaulAssCard),
+		typeof(ClockOutCard),
+		typeof(ElbowGreaseCard),
+		typeof(BestOfTheBestCard),
+	
+		typeof(ReimburseCard),
+		typeof(DeliveryBoxCard),
 	];
 
-	internal static IEnumerable<Type> AllArtifactTypes
-		=> CommonArtifacts.Concat(BossArtifacts);
+    internal static IReadOnlyList<Type> CarrieArtifacts { get; } = [
+		typeof(SlowAndSteadyArtifact),
+		typeof(CatalogueArtifact),
+		typeof(MultiToolArtifact),
+	
+		typeof(ForkliftArtifact),
 
+		typeof(PackageArtifact),
+		typeof(FairTradeArtifact),
+	];
 
     public ModEntry(IPluginPackage<IModManifest> package, IModHelper helper, ILogger logger) : base(package, helper, logger)
 	{
 		Instance = this;
 		Harmony = new(package.Manifest.UniqueName);
-		KokoroApi = helper.ModRegistry.GetApi<IKokoroApi>("Shockah.Kokoro")!;
+		EssentialsApi = helper.ModRegistry.GetApi<IEssentialsApi>("Nickel.Essentials");
+		KokoroApi = helper.ModRegistry.GetApi<IKokoroApi>("Shockah.Kokoro")!.V2;
+		MoreDifficultiesApi = helper.ModRegistry.GetApi<IMoreDifficultiesApi>("TheJazMaster.MoreDifficulties");
 
 		DynamicWidthCardAction.ApplyPatches(Harmony);
 		_ = new CardBrowseFilterManager();
-		_ = new BideManager();
-		SingleBrittleManager = new SingleDamModManager(PDamMod.brittle);
-		SingleWeakManager = new SingleDamModManager(PDamMod.weak);
-		_ = new DisarmManager();
-		_ = new HardWorkerManager();
 		_ = new ArtifactInterfacesManager();
-		_ = new PriorityManager();
 
 		AnyLocalizations = new JsonLocalizationProvider(
 			tokenExtractor: new SimpleLocalizationTokenExtractor(),
@@ -134,24 +161,43 @@ public sealed class ModEntry : SimpleMod {
 			new CurrentLocaleOrEnglishLocalizationProvider<IReadOnlyList<string>>(AnyLocalizations)
 		);
 
+		// PEACHES REGISTRATION
+		{
+		_ = new FuryManager();
+		SingleBrittleManager = new SingleDamModManager(PDamMod.brittle);
+		SingleWeakManager = new SingleDamModManager(PDamMod.weak);
+		_ = new DisarmManager();
+		_ = new HardWorkerManager();
+		_ = new PriorityManager();
 
-        PeachesPortrait = helper.Content.Sprites.RegisterSprite(package.PackageRoot.GetRelativeFile("Sprites/PeachesPortrait.png"));
-        PeachesPortraitMini = helper.Content.Sprites.RegisterSprite(package.PackageRoot.GetRelativeFile("Sprites/PeachesPortraitMini.png"));
-		PeachesFrame = helper.Content.Sprites.RegisterSprite(package.PackageRoot.GetRelativeFile("Sprites/PeachesFrame.png"));
-        PeachesCardBorder = helper.Content.Sprites.RegisterSprite(package.PackageRoot.GetRelativeFile("Sprites/PeachesCardBorder.png"));
+		PeachesCharacter = RegisterCharacter("Peaches", new Color("DEA0A0"), PeachesCards, PeachesArtifacts,
+			new StarterDeck {
+				cards = [
+					new HitEmCard(),
+					new WhereItHurtsCard()
+				]
+			},
+			new StarterDeck {
+				cards = [
+					new ResentmentCard(),
+					new PlatonicShotCard()
+				]
+			}
+		);
+		PeachesDeck = PeachesCharacter.Configuration.Deck;
+		RegisterAnimation(PeachesDeck, "Peaches", "squint");
 
-
-        BideStatus = helper.Content.Statuses.RegisterStatus("Bide", new()
+        FuryStatus = helper.Content.Statuses.RegisterStatus("Fury", new()
 		{
 			Definition = new()
 			{
-				icon = helper.Content.Sprites.RegisterSprite(package.PackageRoot.GetRelativeFile("Sprites/icons/Bide.png")).Sprite,
+				icon = helper.Content.Sprites.RegisterSprite(package.PackageRoot.GetRelativeFile("Sprites/icons/Fury.png")).Sprite,
 				color = new("FF2D2D"),
 				isGood = true
-			},
-			Name = AnyLocalizations.Bind(["status", "Bide", "name"]).Localize,
-			Description = AnyLocalizations.Bind(["status", "Bide", "description"]).Localize
-		});
+			},	
+			Name = AnyLocalizations.Bind(["status", "Fury", "name"]).Localize,
+			Description = AnyLocalizations.Bind(["status", "Fury", "description"]).Localize
+		}).Status;
 
         HardWorkerStatus = helper.Content.Statuses.RegisterStatus("HardWorker", new()
 		{
@@ -163,7 +209,7 @@ public sealed class ModEntry : SimpleMod {
 			},
 			Name = AnyLocalizations.Bind(["status", "HardWorker", "name"]).Localize,
 			Description = AnyLocalizations.Bind(["status", "HardWorker", "description"]).Localize
-		});
+		}).Status;
 
         DisarmedStatus = helper.Content.Statuses.RegisterStatus("Disarmed", new()
 		{
@@ -174,7 +220,7 @@ public sealed class ModEntry : SimpleMod {
 			},
 			Name = AnyLocalizations.Bind(["status", "Disarmed", "name"]).Localize,
 			Description = AnyLocalizations.Bind(["status", "Disarmed", "description"]).Localize
-		});
+		}).Status;
 
         FakeMissing1Status = helper.Content.Statuses.RegisterStatus("FakeStatus1", new()
 		{
@@ -185,7 +231,7 @@ public sealed class ModEntry : SimpleMod {
 			},
 			Name = AnyLocalizations.Bind(["status", "FakeMissing1", "name"]).Localize,
 			Description = AnyLocalizations.Bind(["status", "FakeMissing1", "description"]).Localize
-		});
+		}).Status;
         FakeMissing2Status = helper.Content.Statuses.RegisterStatus("FakeStatus2", new()
 		{
 			Definition = new()
@@ -195,17 +241,26 @@ public sealed class ModEntry : SimpleMod {
 			},
 			Name = AnyLocalizations.Bind(["status", "FakeMissing2", "name"]).Localize,
 			Description = AnyLocalizations.Bind(["status", "FakeMissing2", "description"]).Localize
-		});
+		}).Status;
 
-		BottleUpArt = helper.Content.Sprites.RegisterSprite(Instance.Package.PackageRoot.GetRelativeFile("Sprites/Cards/BottleUp.png")).Sprite;
 
+		// helper.Content.Cards.OnGetFinalDynamicCardTraitOverrides += (card, data) => {
+		// 	State state = data.State;
+		// 	if (state.route is Combat combat) {
+		// 		foreach (Artifact item in data.State.EnumerateAllArtifacts()) {
+		// 			if (item is PriorityMail artifact && artifact.active && !data.TraitStates[PriorityManager.PriorityTrait].IsActive) {
+		// 				data.SetOverride(PriorityManager.FastTrait, true);
+		// 			}
+		// 		}
+		// 	}
+		// };
 
 		Spr WorkforceBlankIcon = helper.Content.Sprites.RegisterSprite(package.PackageRoot.GetRelativeFile("Sprites/icons/Workforce.png")).Sprite;
 		HashSet<Deck> lastCrew = [];
-		Texture2D cachedTexture = null;
+		Texture2D cachedTexture = SpriteLoader.Get(WorkforceBlankIcon)!;
 		WorkforceIcon = helper.Content.Sprites.RegisterDynamicSprite(delegate {
-			var characterSet = MG.inst.g.state.characters.ToHashSet().Select(c => (Deck)c.deckType).ToHashSet();
-			characterSet.Remove(PeachesDeck.Deck);
+			var characterSet = MG.inst.g.state.characters.ToHashSet().Select(c => (Deck)c.deckType!).ToHashSet();
+			characterSet.Remove(PeachesDeck);
 			if (lastCrew.SetEquals(characterSet)) return cachedTexture;
 
 
@@ -215,7 +270,7 @@ public sealed class ModEntry : SimpleMod {
 				colors = [DB.decks[Deck.dizzy].color, DB.decks[Deck.riggs].color];
 			}
 			var texture = SpriteLoader.Get(WorkforceBlankIcon);
-			var data = new MGColor[texture.Width * texture.Height];
+			var data = new MGColor[texture!.Width * texture.Height];
 			int count = colors.Count; int textureWidth = 5;
 			texture.GetData(data);
 
@@ -238,87 +293,117 @@ public sealed class ModEntry : SimpleMod {
 
 			var outTexture = new Texture2D(MG.inst.GraphicsDevice, texture.Width, texture.Height);
 			outTexture.SetData(data);
+			
+			texture.Dispose();
+			cachedTexture.Dispose();
+			
 			cachedTexture = outTexture;
 			return outTexture;
-		});
-		DrawAttacksIcon = helper.Content.Sprites.RegisterSprite(package.PackageRoot.GetRelativeFile("Sprites/icons/DrawAttacks.png"));
+		}).Sprite;
 
+		DrawAttacksIcon = helper.Content.Sprites.RegisterSprite(package.PackageRoot.GetRelativeFile("Sprites/icons/DrawAttacks.png")).Sprite;
+		// BrittleIcon = helper.Content.Sprites.RegisterSprite(package.PackageRoot.GetRelativeFile("Sprites/icons/DrawAttacks.png"));
+		SecretBrittleIcon = helper.Content.Sprites.RegisterSprite(package.PackageRoot.GetRelativeFile("Sprites/icons/SecretBrittle.png")).Sprite;
+		SingleBrittleIcon = helper.Content.Sprites.RegisterSprite(package.PackageRoot.GetRelativeFile("Sprites/icons/SingleBrittle.png")).Sprite;
+		SecretSingleBrittleIcon = helper.Content.Sprites.RegisterSprite(package.PackageRoot.GetRelativeFile("Sprites/icons/SecretSingleBrittle.png")).Sprite;
+		}
 
-		PeachesDeck = helper.Content.Decks.RegisterDeck("Peaches", new()
+		// CARRIE REGISTRATION
 		{
-			Definition = new() { color = new Color("DEA0A0"), titleColor = Colors.black },
-			DefaultCardArt = StableSpr.cards_colorless,
-			BorderSprite = PeachesCardBorder.Sprite,
-			Name = AnyLocalizations.Bind(["character", "name"]).Localize
-		});
+		_ = new TiringManager();
+		_ = new MundaneManager();
 
-        foreach (var cardType in AllCardTypes)
-			AccessTools.DeclaredMethod(cardType, nameof(IPeachesCard.Register))?.Invoke(null, [helper]);
-		foreach (var artifactType in AllArtifactTypes)
-			AccessTools.DeclaredMethod(artifactType, nameof(IPeachesCard.Register))?.Invoke(null, [helper]);
-
-			helper.Content.Cards.OnGetFinalDynamicCardTraitOverrides += (card, data) => {
-			State state = data.State;
-			if (state.route is Combat combat) {
-				foreach (Artifact item in data.State.EnumerateAllArtifacts()) {
-					if (item is PriorityMail artifact && artifact.active && !data.TraitStates[PriorityManager.PriorityTrait].IsActive) {
-						data.SetOverride(PriorityManager.FastTrait, true);
-					}
-				}
-			}
-		};
-
-		MoreDifficultiesApi?.RegisterAltStarters(PeachesDeck.Deck, new() {
-			cards = [
-				new AngerManagementCard(),
-				new SurpriseShotCard()
-			]
-		});
-
-        PeachesCharacter = helper.Content.Characters.V2.RegisterPlayableCharacter("Peaches", new()
-		{
-			Deck = PeachesDeck.Deck,
-			Description = AnyLocalizations.Bind(["character", "description"]).Localize,
-			BorderSprite = PeachesFrame.Sprite,
-			Starters = new StarterDeck {
+		CarrieCharacter = RegisterCharacter("Carrie", new Color("464764"), CarrieCards, CarrieArtifacts,
+			new StarterDeck {
 				cards = [
-					new HitEmCard(),
-					new WhereItHurtsCard()
+					new ClockInCard(),
+					new ScroungeCard()
 				]
 			},
-			NeutralAnimation = new()
-			{
-				CharacterType = PeachesDeck.Deck.Key(),
-				LoopTag = "neutral",
-				Frames = [
-					PeachesPortrait.Sprite
-				]
-			},
-			MiniAnimation = new()
-			{
-				CharacterType = PeachesDeck.Deck.Key(),
-				LoopTag = "mini",
-				Frames = [
-					PeachesPortraitMini.Sprite
+			new StarterDeck {
+				cards = [
+					new SpecialDeliveryCard()
+				],
+				artifacts = [
+					new SlowAndSteadyArtifact()
 				]
 			}
-		});
+		);
+		CarrieDeck = CarrieCharacter.Configuration.Deck;
+		RegisterAnimation(CarrieDeck, "Carrie", "squint");
 
-		// helper.Content.Characters.RegisterCharacterAnimation("GameOver", new()
-		// {
-		// 	Deck = PeachesDeck.Deck,
-		// 	LoopTag = "gameover",
-		// 	Frames = Enumerable.Range(0, 1)
-		// 		.Select(i => helper.Content.Sprites.RegisterSprite(package.PackageRoot.GetRelativeFile($"Sprites/character/GameOver/{i}.png")).Sprite)
-		// 		.ToList()
-		// });
-		// helper.Content.Characters.RegisterCharacterAnimation("Squint", new()
-		// {
-		// 	Deck = PeachesDeck.Deck,
-		// 	LoopTag = "squint",
-		// 	Frames = Enumerable.Range(0, 5)
-		// 		.Select(i => helper.Content.Sprites.RegisterSprite(package.PackageRoot.GetRelativeFile($"Sprites/character/Squint/{i}.png")).Sprite)
-		// 		.ToList()
-		// });
+        CardFindStatus = helper.Content.Statuses.RegisterStatus("CardFind", new()
+		{
+			Definition = new()
+			{
+				icon = helper.Content.Sprites.RegisterSprite(package.PackageRoot.GetRelativeFile("Sprites/icons/CardFind.png")).Sprite,
+				color = new("50687c"),
+				isGood = true
+			},	
+			Name = AnyLocalizations.Bind(["status", "CardFind", "name"]).Localize,
+			Description = AnyLocalizations.Bind(["status", "CardFind", "description"]).Localize
+		}).Status;
+
+        ArtifactFindStatus = helper.Content.Statuses.RegisterStatus("ArtifactFind", new()
+		{
+			Definition = new()
+			{
+				icon = helper.Content.Sprites.RegisterSprite(package.PackageRoot.GetRelativeFile("Sprites/icons/ArtifactFind.png")).Sprite,
+				color = new("ffb300"),
+				isGood = true
+			},
+			Name = AnyLocalizations.Bind(["status", "ArtifactFind", "name"]).Localize,
+			Description = AnyLocalizations.Bind(["status", "ArtifactFind", "description"]).Localize
+		}).Status;
+		}
+
+		Harmony.PatchAll();
+
     }
+
+
+	public IPlayableCharacterEntryV2 RegisterCharacter(string name, Color color, IReadOnlyList<Type> cardTypes, IReadOnlyList<Type> artifactTypes, StarterDeck starters, StarterDeck altStarters) {
+		var borderSprite = Helper.Content.Sprites.RegisterSprite(Package.PackageRoot.GetRelativeFile($"Sprites/Characters/{name}/{name}CardBorder.png")).Sprite;
+		var frameSprite = Helper.Content.Sprites.RegisterSprite(Package.PackageRoot.GetRelativeFile($"Sprites/Characters/{name}/{name}Frame.png")).Sprite;
+
+		var deck = Helper.Content.Decks.RegisterDeck(name, new()
+		{
+			Definition = new() {
+				color = color,
+				titleColor = Colors.black
+			},
+			DefaultCardArt = StableSpr.cards_colorless,
+			BorderSprite = borderSprite,
+			Name = AnyLocalizations.Bind(["character", name, "name"]).Localize
+		}).Deck;
+
+        foreach (var cardType in cardTypes)
+			AccessTools.DeclaredMethod(cardType, nameof(IRegisterableCard.Register))?.Invoke(null, [deck, name, Helper, Package]);
+		foreach (var artifactType in artifactTypes)
+			AccessTools.DeclaredMethod(artifactType, nameof(IRegisterableCard.Register))?.Invoke(null, [deck, name, Helper, Package]);
+
+		MoreDifficultiesApi?.RegisterAltStarters(deck, altStarters);
+
+        return Helper.Content.Characters.V2.RegisterPlayableCharacter(name, new()
+		{
+			Deck = deck,
+			Description = AnyLocalizations.Bind(["character", name, "description"]).Localize,
+			BorderSprite = frameSprite,
+			Starters = starters,
+			NeutralAnimation = RegisterAnimation(deck, name, "neutral"),
+			MiniAnimation = RegisterAnimation(deck, name, "mini"),
+		});
+	}
+
+	private CharacterAnimationConfigurationV2 RegisterAnimation(Deck deck, string charname, string name) =>
+		Helper.Content.Characters.V2.RegisterCharacterAnimation(charname + "_" + name, new()
+		{
+			CharacterType = deck.Key(),
+			LoopTag = name,
+			Frames = Enumerable.Range(1, 10)
+				.Select(i => Package.PackageRoot.GetRelativeFile($"Sprites/Characters/{charname}/{name}/{charname}_{name}_{i}.png"))
+				.TakeWhile(f => f.Exists)
+				.Select(f => Helper.Content.Sprites.RegisterSprite(f).Sprite)
+				.ToList()
+		}).Configuration;
 }
