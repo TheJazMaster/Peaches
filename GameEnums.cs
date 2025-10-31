@@ -1,6 +1,6 @@
 ﻿using Nanoray.EnumByNameSourceGenerator;
 
-namespace TheJazMaster.Peaches;
+namespace TheJazMaster.UnseenEffort;
 
 [EnumByName(typeof(Spr))]
 internal static partial class StableSpr { }

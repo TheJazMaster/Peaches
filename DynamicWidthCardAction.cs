@@ -2,7 +2,7 @@
 using System;
 using System.Reflection;
 
-namespace TheJazMaster.Peaches;
+namespace TheJazMaster.UnseenEffort;
 
 public abstract class DynamicWidthCardAction : CardAction
 {

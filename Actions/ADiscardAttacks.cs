@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using System.Threading;
 
-#nullable enable
-namespace TheJazMaster.Peaches.Actions;
+namespace TheJazMaster.UnseenEffort.Actions;
 
 public class ADiscardAttacks : CardAction
 {

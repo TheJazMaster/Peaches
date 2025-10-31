@@ -1,8 +1,7 @@
 using Nickel;
-using TheJazMaster.Peaches.Features;
+using TheJazMaster.UnseenEffort.Features;
 
-#nullable enable
-namespace TheJazMaster.Peaches.Actions;
+namespace TheJazMaster.UnseenEffort.Actions;
 
 public class AMakeFast : CardAction
 {

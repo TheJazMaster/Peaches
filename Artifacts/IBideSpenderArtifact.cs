@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace TheJazMaster.Peaches.Artifacts;
+namespace TheJazMaster.UnseenEffort.Artifacts;
 
-public interface IBideSpenderArtifact
+public interface IFurySpenderArtifact
 {
-    public void OnBideSpend(State s, Combat c, AAttack attack, int amount);
+    public void OnFurySpend(State s, Combat c, AAttack attack, int amount);
 }

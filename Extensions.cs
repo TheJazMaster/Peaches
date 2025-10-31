@@ -6,8 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
-#nullable enable
-namespace TheJazMaster.Peaches;
+namespace TheJazMaster.UnseenEffort;
 
 internal static class Extensions
 {

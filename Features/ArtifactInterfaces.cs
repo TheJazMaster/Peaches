@@ -3,28 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HarmonyLib;
-using TheJazMaster.Peaches.Artifacts;
+using TheJazMaster.UnseenEffort.Artifacts;
 
-namespace TheJazMaster.Peaches.Features;
+namespace TheJazMaster.UnseenEffort.Features;
 
+[HarmonyPatch]
 public class ArtifactInterfacesManager
 {
-    public ArtifactInterfacesManager()
-    {
-        ModEntry.Instance.Harmony.TryPatch(
-		    logger: ModEntry.Instance.Logger,
-		    original: AccessTools.DeclaredMethod(typeof(Card), nameof(Card.GetDataWithOverrides)),
-			postfix: new HarmonyMethod(GetType(), nameof(Card_GetDataWithOverrides_Postfix))
-		);
-
-        ModEntry.Instance.Harmony.TryPatch(
-		    logger: ModEntry.Instance.Logger,
-		    original: AccessTools.DeclaredMethod(typeof(Ship), nameof(Ship.Set)),
-            prefix: new HarmonyMethod(GetType(), nameof(Ship_Set_Prefix)),
-			postfix: new HarmonyMethod(GetType(), nameof(Ship_Set_Postfix))
-		);
-    }
-
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(Card), nameof(Card.GetDataWithOverrides))]
     private static void Card_GetDataWithOverrides_Postfix(Card __instance, ref CardData __result, State state) {
         if (state == DB.fakeState)
             return;
@@ -38,12 +25,16 @@ public class ArtifactInterfacesManager
         }
     }
     
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Ship), nameof(Ship.Set))]
     private static void Ship_Set_Prefix(Ship __instance, Status status, int n, ref int __state) {
         if (status == Status.survive) {
             __state = __instance.Get(Status.survive);
         }
     }
     
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(Ship), nameof(Ship.Set))]
     private static void Ship_Set_Postfix(Ship __instance, Status status, int n, int __state) {
         if (__state > 0 && __instance.Get(Status.survive) < __state) {
             foreach (Artifact item in MG.inst.g.state.EnumerateAllArtifacts()) {

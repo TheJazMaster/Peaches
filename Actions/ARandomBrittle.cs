@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using TheJazMaster.Peaches.Features;
+using Nickel;
+using TheJazMaster.UnseenEffort.Features;
 
-namespace TheJazMaster.Peaches.Actions;
+namespace TheJazMaster.UnseenEffort.Actions;
 
 public class ARandomBrittle : CardAction
 {
@@ -43,4 +44,21 @@ public class ARandomBrittle : CardAction
 			});
         }
     }
+
+    private Spr GetSprite() => hidden ? (single ? ModEntry.Instance.SecretSingleBrittleIcon : ModEntry.Instance.SecretBrittleIcon)
+        : (single ? ModEntry.Instance.SingleBrittleIcon : StableSpr.icons_brittle);
+
+	public override Icon? GetIcon(State s) =>
+		new Icon(GetSprite(), count, Colors.redd);
+
+	public override List<Tooltip> GetTooltips(State s) => [
+        new GlossaryTooltip($"action.{GetType().Namespace!}::RandomBrittle" + single + hidden) {
+            Icon = GetSprite(),
+            TitleColor = Colors.action,
+            Title = ModEntry.Instance.Localizations.Localize(["action", "brittle", hidden ? "hidden" : "normal", single ? "single" : "normal", "name"]),
+            Description = ModEntry.Instance.Localizations.Localize(["action", "brittle", hidden ? "hidden" : "normal", single ? "single" : "normal", "description", count == 1 ? "singular" : "plural"], new { Amount = count })
+        },
+        new TTGlossary("parttrait.brittle")
+    ];
+
 }
