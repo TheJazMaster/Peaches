@@ -1,16 +1,9 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using Nanoray.Shrike;
 using Nanoray.Shrike.Harmony;
-using System.Threading.Tasks;
-using Nickel;
 using HarmonyLib;
 using System.Reflection.Emit;
 using System.Reflection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Xna.Framework.Input.Touch;
-using System.Globalization;
 
 namespace TheJazMaster.UnseenEffort.Features;
 

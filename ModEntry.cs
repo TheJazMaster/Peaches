@@ -7,16 +7,13 @@ using Nickel;
 using Nickel.Essentials;
 using Shockah.Kokoro;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using TheJazMaster.UnseenEffort.Artifacts;
 using TheJazMaster.UnseenEffort.Artifacts.Carrie;
 using TheJazMaster.UnseenEffort.Artifacts.Peaches;
-using TheJazMaster.UnseenEffort.Cards;
 using TheJazMaster.UnseenEffort.Cards.Carrie;
 using TheJazMaster.UnseenEffort.Cards.Peaches;
+using TheJazMaster.UnseenEffort.Dialogue.Carrie;
 using TheJazMaster.UnseenEffort.Features;
 using MGColor = Microsoft.Xna.Framework.Color;
 
@@ -29,6 +26,8 @@ public sealed class ModEntry : SimpleMod {
 	internal IEssentialsApi? EssentialsApi { get; }
 	internal IKokoroApi.IV2 KokoroApi { get; }
 	internal IMoreDifficultiesApi? MoreDifficultiesApi { get; }
+    internal LocalDB LocalDB { get; private set; } = null!;
+
 	internal SingleDamModManager SingleBrittleManager { get; }
 	internal SingleDamModManager SingleWeakManager { get; }
 	internal ILocalizationProvider<IReadOnlyList<string>> AnyLocalizations { get; }
@@ -107,7 +106,7 @@ public sealed class ModEntry : SimpleMod {
 		typeof(SafetyMeasuresCard),
 		typeof(SmokeBreakCard),
 		typeof(PackageCard),
-		typeof(RetrieveCard),
+		typeof(InventoryLogsCard),
 		typeof(FixerUpperCard),
         typeof(UnboxingCard),
 		typeof(RepurposeCard),
@@ -123,7 +122,7 @@ public sealed class ModEntry : SimpleMod {
 		typeof(SpecialDeliveryCard),
 		typeof(HaulAssCard),
 		typeof(ClockOutCard),
-		typeof(ElbowGreaseCard),
+		typeof(RetrofitCard),
 		typeof(BestOfTheBestCard),
 	
 		typeof(ReimburseCard),
@@ -131,13 +130,15 @@ public sealed class ModEntry : SimpleMod {
 	];
 
     internal static IReadOnlyList<Type> CarrieArtifacts { get; } = [
-		typeof(SlowAndSteadyArtifact),
+		typeof(WatchArtifact),
 		typeof(CatalogueArtifact),
 		typeof(MultiToolArtifact),
-	
+		typeof(ElbowGreaseArtifact),
+			
 		typeof(ForkliftArtifact),
 
 		typeof(PackageArtifact),
+		typeof(RetrofittedPartsArtifact),
 		typeof(FairTradeArtifact),
 	];
 
@@ -148,10 +149,6 @@ public sealed class ModEntry : SimpleMod {
 		EssentialsApi = helper.ModRegistry.GetApi<IEssentialsApi>("Nickel.Essentials");
 		KokoroApi = helper.ModRegistry.GetApi<IKokoroApi>("Shockah.Kokoro")!.V2;
 		MoreDifficultiesApi = helper.ModRegistry.GetApi<IMoreDifficultiesApi>("TheJazMaster.MoreDifficulties");
-
-		DynamicWidthCardAction.ApplyPatches(Harmony);
-		_ = new CardBrowseFilterManager();
-		_ = new ArtifactInterfacesManager();
 
 		AnyLocalizations = new JsonLocalizationProvider(
 			tokenExtractor: new SimpleLocalizationTokenExtractor(),
@@ -312,8 +309,10 @@ public sealed class ModEntry : SimpleMod {
 		{
 		_ = new TiringManager();
 		_ = new MundaneManager();
+        _ = new FindManager();
+        _ = new DetourManager();
 
-		CarrieCharacter = RegisterCharacter("Carrie", new Color("464764"), CarrieCards, CarrieArtifacts,
+        CarrieCharacter = RegisterCharacter("Carrie", new Color("464764"), CarrieCards, CarrieArtifacts,
 			new StarterDeck {
 				cards = [
 					new ClockInCard(),
@@ -325,7 +324,7 @@ public sealed class ModEntry : SimpleMod {
 					new SpecialDeliveryCard()
 				],
 				artifacts = [
-					new SlowAndSteadyArtifact()
+					new WatchArtifact()
 				]
 			}
 		);
@@ -355,7 +354,51 @@ public sealed class ModEntry : SimpleMod {
 			Name = AnyLocalizations.Bind(["status", "ArtifactFind", "name"]).Localize,
 			Description = AnyLocalizations.Bind(["status", "ArtifactFind", "description"]).Localize
 		}).Status;
+
+        DetourStatus = helper.Content.Statuses.RegisterStatus("Detour", new()
+		{
+			Definition = new()
+			{
+				icon = helper.Content.Sprites.RegisterSprite(package.PackageRoot.GetRelativeFile("Sprites/icons/Detour.png")).Sprite,
+				color = new("ffb300"),
+				isGood = true
+			},
+			Name = AnyLocalizations.Bind(["status", "Detour", "name"]).Localize,
+			Description = AnyLocalizations.Bind(["status", "Detour", "description"]).Localize
+		}).Status;
+
+        DetourPlusStatus = helper.Content.Statuses.RegisterStatus("DetourPlus", new()
+		{
+			Definition = new()
+			{
+				icon = helper.Content.Sprites.RegisterSprite(package.PackageRoot.GetRelativeFile("Sprites/icons/DetourPlus.png")).Sprite,
+				color = new("ffb300"),
+				isGood = true
+			},
+			Name = AnyLocalizations.Bind(["status", "DetourPlus", "name"]).Localize,
+			Description = AnyLocalizations.Bind(["status", "DetourPlus", "description"]).Localize
+		}).Status;
 		}
+
+		EventDialogue.Initialize(package, helper);
+
+        helper.Events.OnModLoadPhaseFinished += (_, phase) =>
+        {
+            if (phase == ModLoadPhase.AfterDbInit)
+            {
+            	LocalDB = new(helper, package);
+
+                EventDialogue.MakeFairTradeNodes();
+            }
+        };
+		helper.Events.OnLoadStringsForLocale += (_, thing) =>
+        {
+            foreach (KeyValuePair<string, string> entry in LocalDB.GetLocalizationResults())
+            {
+                thing.Localizations[entry.Key] = entry.Value;
+            }
+            EventDialogue.AddFairTradeNodeLines(thing);
+        };
 
 		Harmony.PatchAll();
 

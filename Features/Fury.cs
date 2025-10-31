@@ -1,20 +1,16 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Nanoray.Shrike;
 using Nanoray.Shrike.Harmony;
-using System.Threading.Tasks;
 using Nickel;
 using HarmonyLib;
 using System.Reflection.Emit;
 using System.Reflection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Xna.Framework.Input.Touch;
-using System.Globalization;
 using TheJazMaster.UnseenEffort.Artifacts;
 
 namespace TheJazMaster.UnseenEffort.Features;
 
+[HarmonyPatch]
 public class FuryManager
 {
     private static IModData ModData => ModEntry.Instance.Helper.ModData;
@@ -23,22 +19,6 @@ public class FuryManager
 
     public FuryManager()
     {
-        ModEntry.Instance.Harmony.TryPatch(
-		    logger: ModEntry.Instance.Logger,
-		    original: AccessTools.DeclaredMethod(typeof(AAttack), nameof(AAttack.Begin)),
-			transpiler: new HarmonyMethod(GetType(), nameof(AAttack_Begin_Transpiler))
-		);
-        ModEntry.Instance.Harmony.TryPatch(
-		    logger: ModEntry.Instance.Logger,
-		    original: AccessTools.DeclaredMethod(typeof(Card), nameof(Card.GetActionsOverridden)),
-			postfix: new HarmonyMethod(GetType(), nameof(Card_GetActionsOverridden_Postfix))
-		);
-        ModEntry.Instance.Harmony.TryPatch(
-		    logger: ModEntry.Instance.Logger,
-		    original: AccessTools.DeclaredMethod(typeof(Card), nameof(Card.GetActualDamage)),
-			postfix: new HarmonyMethod(GetType(), nameof(Card_GetActualDamage_Postfix))
-		);
-
         if (ModEntry.Instance.Helper.ModRegistry.ResolvedMods.ContainsKey("Mezz.TwosCompany"))
             ModEntry.Instance.Harmony.TryPatch(
                 logger: ModEntry.Instance.Logger,
@@ -50,6 +30,8 @@ public class FuryManager
             );
     }
 
+    [HarmonyTranspiler]
+    [HarmonyPatch(typeof(AAttack), nameof(AAttack.Begin))]
     private static IEnumerable<CodeInstruction> AAttack_Begin_Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator il, MethodBase originalMethod)
     {
         return new SequenceBlockMatcher<CodeInstruction>(instructions)
@@ -90,6 +72,8 @@ public class FuryManager
         }
     }
 
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(Card), nameof(Card.GetActualDamage))]
     private static void Card_GetActualDamage_Postfix(State s, ref int __result, int baseDamage, bool targetPlayer = false, Card? card = null)
     {
         if (card != null) {
@@ -99,6 +83,8 @@ public class FuryManager
         }
     }
 
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(Card), nameof(Card.GetActionsOverridden))]
     private static void Card_GetActionsOverridden_Postfix(State s, Combat c, Card __instance, ref List<CardAction> __result)
     {
         bool skip = true;

@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Linq;
+using Nickel;
 using TheJazMaster.UnseenEffort.Artifacts.Carrie;
 
 namespace TheJazMaster.UnseenEffort.Actions;
@@ -18,4 +20,13 @@ public class ARemoveFairTrade : CardAction
 			}
 		}
 	}
+
+    public override List<Tooltip> GetTooltips(State s) => [
+        new GlossaryTooltip(GetType().Name) {
+            Title = ModEntry.Instance.Localizations.Localize(["action", "removeFairTrade", "name"]),
+            TitleColor = Colors.action,
+            Icon = StableSpr.icons_loseArtifact,
+            Description = ModEntry.Instance.Localizations.Localize(["action", "removeFairTrade", "description"]),
+        }
+    ];
 }

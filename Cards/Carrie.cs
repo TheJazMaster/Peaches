@@ -3,13 +3,10 @@ using TheJazMaster.UnseenEffort.Actions;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
-using static TheJazMaster.UnseenEffort.Features.PriorityManager;
 using TheJazMaster.UnseenEffort.Features;
 using Nanoray.PluginManager;
-using System.Net;
 using HarmonyLib;
 using daisyowl.text;
-using System.Runtime.CompilerServices;
 using System;
 
 namespace TheJazMaster.UnseenEffort.Cards.Carrie;
@@ -22,7 +19,7 @@ internal sealed class ClockInCard : Card, IRegisterableCard, IHasCustomCardTrait
 	}
 
 	public override CardData GetData(State state) => new() {
-		cost = 0,
+		cost = 1,
 		singleUse = true,
 		temporary = true
 	};
@@ -81,7 +78,7 @@ internal sealed class SafetyMeasuresCard : Card, IRegisterableCard, IHasCustomCa
 	}
 
 	public override CardData GetData(State state) => new() {
-		cost = 0,
+		cost = 1,
 		singleUse = true,
 		temporary = true
 	};
@@ -111,7 +108,7 @@ internal sealed class SmokeBreakCard : Card, IRegisterableCard, IHasCustomCardTr
 	}
 
 	public override CardData GetData(State state) => new() {
-		cost = upgrade == Upgrade.B ? 2 : 0,
+		cost = 1,
 		singleUse = upgrade != Upgrade.B,
 		exhaust = upgrade == Upgrade.B,
 		temporary = upgrade != Upgrade.B,
@@ -135,7 +132,7 @@ internal sealed class PackageCard : Card, IRegisterableCard
 
 	public override CardData GetData(State state) => new() {
 		cost = 1,
-		singleUse = upgrade != Upgrade.B,
+		singleUse = true,
 		retain = true,
 		description = ModEntry.Instance.Localizations.Localize(["card", "Carrie", CardName, "description", upgrade.ToString()])
 	};
@@ -161,7 +158,7 @@ internal sealed class PackageCard : Card, IRegisterableCard
 	};
 }
 
-internal sealed class RetrieveCard : Card, IRegisterableCard, IHasCustomCardTraits
+internal sealed class InventoryLogsCard : Card, IRegisterableCard, IHasCustomCardTraits
 {
 	private static string CardName = null!;
 	public static void Register(Deck deck, string charname, IModHelper helper, IPluginPackage<IModManifest> package) {
@@ -169,34 +166,66 @@ internal sealed class RetrieveCard : Card, IRegisterableCard, IHasCustomCardTrai
 	}
 
 	public override CardData GetData(State state) => new() {
-		cost = 0,
-		singleUse = upgrade != Upgrade.B,
-		exhaust = upgrade == Upgrade.B,
-		temporary = upgrade != Upgrade.B,
-		description = ModEntry.Instance.Localizations.Localize(["card", "Carrie", CardName, "description"], new { Amount = GetAmount() })
-	};
-
-	public int GetAmount() => upgrade switch {
-		Upgrade.A => 3,
-		Upgrade.B => 1,
-		_ => 2
+		cost = upgrade == Upgrade.B ? 2 : 0,
+		singleUse = true,
+		temporary = true,
+		description = ModEntry.Instance.Localizations.Localize(["card", "Carrie", CardName, "description", upgrade.ToString()])
 	};
 
 	public IReadOnlySet<ICardTraitEntry> GetInnateTraits(State state) => upgrade == Upgrade.A ? new HashSet<ICardTraitEntry>() : [
 		TiringManager.TiringTrait
 	];
 
-	public override List<CardAction> GetActions(State s, Combat c) => [
-		new AEnergy {
-			changeAmount = GetAmount()
-		},
-		new ACardSelect {
-			browseAction = new ChooseCardToPutInHand(),
-			browseSource = CardBrowse.Source.DrawPile,
-			filterUUID = uuid,
-			omitFromTooltips = true
-		}
-	];
+    public override List<CardAction> GetActions(State s, Combat c) => upgrade switch
+    {
+        Upgrade.A => [
+			new ACardSelect
+			{
+				browseAction = new ChooseCardToPutInHand(),
+				browseSource = CardBrowse.Source.DrawPile,
+				filterUUID = uuid,
+				omitFromTooltips = true
+			},
+			new ACardSelect
+			{
+				browseAction = new ChooseCardToPutInHand(),
+				browseSource = CardBrowse.Source.DrawPile,
+				filterUUID = uuid,
+				omitFromTooltips = true
+			},
+			new ACardSelect
+			{
+				browseAction = new ChooseCardToPutInHand(),
+				browseSource = CardBrowse.Source.DrawPile,
+				filterUUID = uuid,
+				omitFromTooltips = true
+			}
+		],
+        Upgrade.B => [
+			new ACardSelect {
+				browseAction = new CardSelectAddBuoyantForever(),
+				browseSource = CardBrowse.Source.Hand,
+				omitFromTooltips = true,
+				filterBuoyant = false
+			}
+		],
+        _ => [
+			new ACardSelect
+			{
+				browseAction = new ChooseCardToPutInHand(),
+				browseSource = CardBrowse.Source.DrawPile,
+				filterUUID = uuid,
+				omitFromTooltips = true
+			},
+			new ACardSelect
+			{
+				browseAction = new ChooseCardToPutInHand(),
+				browseSource = CardBrowse.Source.DrawPile,
+				filterUUID = uuid,
+				omitFromTooltips = true
+			}
+		]
+    };
 }
 
 internal sealed class FixerUpperCard : Card, IRegisterableCard, IHasCustomCardTraits
@@ -222,9 +251,21 @@ internal sealed class FixerUpperCard : Card, IRegisterableCard, IHasCustomCardTr
 				targetPlayer = true
 			}
 		],
+		Upgrade.A => [
+			new AHullMax {
+				amount = 2,
+				targetPlayer = true,
+				canRunAfterKill = true
+			},
+			new AHeal {
+				healAmount = 2,
+				targetPlayer = true,
+				canRunAfterKill = true
+			}
+		],
 		_ => [
 			new AHeal {
-				healAmount = upgrade == Upgrade.A ? 5 : 2,
+				healAmount = 2,
 				targetPlayer = true,
 				canRunAfterKill = true
 			}
@@ -232,7 +273,7 @@ internal sealed class FixerUpperCard : Card, IRegisterableCard, IHasCustomCardTr
 	};
 }
 
-internal sealed class UnboxingCard : Card, IRegisterableCard
+internal sealed class UnboxingCard : Card, IRegisterableCard, IHasCustomCardTraits
 {
 	private static string CardName = null!;
 	public static void Register(Deck deck, string charname, IModHelper helper, IPluginPackage<IModManifest> package) {
@@ -246,7 +287,11 @@ internal sealed class UnboxingCard : Card, IRegisterableCard
 		description = upgrade == Upgrade.B ? null : ModEntry.Instance.Localizations.Localize(["card", "Carrie", CardName, "description", upgrade.ToString()], new { Amount = GetAmount() })
 	};
 
-	public static int GetAmount() => 4;
+	public IReadOnlySet<ICardTraitEntry> GetInnateTraits(State state) => upgrade == Upgrade.B ? new HashSet<ICardTraitEntry> {
+		MundaneManager.MundaneTrait
+	} : [];
+
+	public int GetAmount() => upgrade == Upgrade.A ? 6 : 1;
 
 	public override List<CardAction> GetActions(State s, Combat c) => upgrade switch {
 		Upgrade.B => [
@@ -259,8 +304,9 @@ internal sealed class UnboxingCard : Card, IRegisterableCard
 		_ => [
 			new ACardOffering {
 				amount = GetAmount(),
-				overrideUpgradeChances = upgrade == Upgrade.A ? true : null,
+				overrideUpgradeChances = true,
 				inCombat = true,
+				canSkip = true,
 				omitFromTooltips = true
 			}
 		]
@@ -281,9 +327,11 @@ internal sealed class RepurposeCard : Card, IRegisterableCard, IHasCustomCardTra
 	public static int GetAmount() => 4;
 
 	public override List<CardAction> GetActions(State s, Combat c) => [
-		new AHullMax {
+		upgrade == Upgrade.A ? new AHurt {
+			hurtAmount = 4,
+			targetPlayer = true
+		} : new AHullMax {
 			amount = upgrade switch {
-				Upgrade.A => -2,
 				Upgrade.B => -5,
 				_ => -4
 			},
@@ -320,14 +368,14 @@ internal sealed class MadeToLastCard : Card, IRegisterableCard, IHasCustomCardTr
 
 	public override List<CardAction> GetActions(State s, Combat c) => upgrade switch {
 		Upgrade.A => [
-			new ARemoveTempFromHand {
+			new ARemoveTempFromDeck {
 				omitFromTooltips = true
 			}
 		],
 		_ => [
 			new ACardSelect {
 				browseAction = new ARemoveTemp(),
-				browseSource = CardBrowse.Source.Hand,
+				browseSource = CardBrowse.Source.Deck,
 				filterUUID = uuid,
 				omitFromTooltips = true,
 				filterTemporary = true
@@ -421,7 +469,7 @@ internal sealed class DetourCard : Card, IRegisterableCard, IHasCustomCardTraits
 	}
 
 	public override CardData GetData(State state) => new() {
-		cost = 1,
+		cost = upgrade == Upgrade.B ? 2 : 1,
 		temporary = upgrade == Upgrade.A,
 		exhaust = upgrade == Upgrade.B,
 		singleUse = upgrade != Upgrade.B
@@ -451,11 +499,12 @@ internal sealed class TradeCard : Card, IRegisterableCard, IHasCustomCardTraits
 		temporary = upgrade != Upgrade.B,
 		exhaust = upgrade == Upgrade.B,
 		singleUse = upgrade != Upgrade.B,
-		description = ModEntry.Instance.Localizations.Localize(["card", "Carrie", CardName, "description", upgrade.ToString()])
+		description = ModEntry.Instance.Localizations.Localize(["card", "Carrie", CardName, "description", upgrade.ToString()]),
 	};
 
 	public override List<CardAction> GetActions(State s, Combat c) => [
 		new Action {
+			cardToRefund = this,
 			actionAfter = upgrade == Upgrade.B ? new AStatus {
 				status = ModEntry.Instance.ArtifactFindStatus,
 				statusAmount = 1,
@@ -478,18 +527,22 @@ internal sealed class TradeCard : Card, IRegisterableCard, IHasCustomCardTraits
 
 	private sealed class Action : CardAction
 	{
-		public required CardAction actionAfter;
+        public Card? cardToRefund;
+        public required CardAction actionAfter;
 
 		public override Route? BeginWithRoute(G g, State s, Combat c)
 			=> new ActionRoute {
+				cardToRefund = cardToRefund,
 				actionAfter = actionAfter
 			};
 	}
 
 	private sealed class ActionRoute : Route, OnMouseDown
 	{
-		public required CardAction actionAfter;
+        public required Card? cardToRefund;
+        public required CardAction actionAfter;
 		private static readonly UK CancelExecutionUK = ModEntry.Instance.Helper.Utilities.ObtainEnumCase<UK>();
+		private static readonly UK ArtifactUK = ModEntry.Instance.Helper.Utilities.ObtainEnumCase<UK>();
 
 		public override bool GetShowOverworldPanels()
 			=> true;
@@ -510,14 +563,19 @@ internal sealed class TradeCard : Card, IRegisterableCard, IHasCustomCardTraits
 			Draw.Rect(0, 0, MG.inst.PIX_W, MG.inst.PIX_H, Colors.black.fadeAlpha(0.5));
 
 			var keyPrefix = $"{typeof(ModEntry).Namespace!}::{nameof(TradeCard)}";
-			foreach (Artifact artifact in g.state.EnumerateAllArtifacts())
+            bool success = false;
+            foreach (Artifact artifact in g.state.EnumerateAllArtifacts())
 			{
-				if (g.boxes.FirstOrDefault(b => b.key is { } key && key.k == StableUK.artifact && key.v == 0 && key.str == artifact.Key()) is not { } realBox)
+				if (artifact.GetMeta().unremovable)
 					continue;
-				
-				artifact.Render(g, realBox.rect.xy);
+                if (g.boxes.FirstOrDefault(b => b.key is { } key && key.k == StableUK.artifact && key.v == 0 && key.str == artifact.Key()) is not { } realBox)
+					continue;
 
-				Box box = g.Push(rect: new Rect(realBox.rect.x, realBox.rect.y, realBox.rect.w, realBox.rect.h));
+                success = true;
+
+                artifact.Render(g, realBox.rect.xy);
+
+				Box box = g.Push(new UIKey(ArtifactUK, 0, artifact.Key()), new Rect(realBox.rect.x, realBox.rect.y, realBox.rect.w, realBox.rect.h));
 
 				box.onMouseDown = this;
 				if (box.IsHover())
@@ -529,6 +587,10 @@ internal sealed class TradeCard : Card, IRegisterableCard, IHasCustomCardTraits
 
 				g.Pop();
 			}
+
+			if (!success) {
+                Draw.Text(ModEntry.Instance.Localizations.Localize(["card", "Carrie", "Trade", "ui", "noValid"]), MG.inst.PIX_W / 2, MG.inst.PIX_H / 2 - 26, color: Colors.textMain, align: TAlign.Center);
+            }
 
 			SharedArt.ButtonText(
 				g,
@@ -543,9 +605,13 @@ internal sealed class TradeCard : Card, IRegisterableCard, IHasCustomCardTraits
 		{
 			if (b.key == null) return;
 			if (b.key == CancelExecutionUK) {
+				if (cardToRefund != null) {
+                    g.state.RemoveCardFromWhereverItIs(cardToRefund.uuid);
+					if (g.state.route is Combat c) c.SendCardToHand(g.state, cardToRefund);
+                }
 				g.CloseRoute(this);
 			}
-			else if (b.key.Value.k == StableUK.artifact) {
+			else if (b.key.Value.k == ArtifactUK) {
 				var artifact = g.state.EnumerateAllArtifacts().FirstOrDefault(artifact => artifact.Key() == b.key.Value.str);
 				if (artifact != null && g.state.route is Combat c) {
 					c.QueueImmediate([
@@ -572,16 +638,25 @@ internal sealed class PushThroughCard : Card, IRegisterableCard
 		cost = 2,
 		exhaust = upgrade != Upgrade.B,
 		singleUse = upgrade == Upgrade.B,
-		description = upgrade == Upgrade.B ? null : ModEntry.Instance.Localizations.Localize(["card", "Carrie", CardName, "description", upgrade.ToString()])
+		description = upgrade == Upgrade.B ? null : ModEntry.Instance.Localizations.Localize(["card", "Carrie", CardName, state == DB.fakeState ? "descriptionAlt" : "description"], new {
+			Damage = GetDmg(state, GetBaseDmg(state)),
+			Reduction = GetReduction()
+		})
 	};
 
 	public static int GetZonesCleared(State s) => ModEntry.Instance.Helper.ModData.GetModDataOrDefault(s, TiringManager.TiringCostKey, 0);
 
-	public int GetBaseDmg(State s) => upgrade switch {
-		Upgrade.A => 13 - 6*GetZonesCleared(s),
+    public int GetReduction() => upgrade switch {
+        Upgrade.A => 6,
+        Upgrade.B => 0,
+        _ => 4
+    };
+
+    public int GetBaseDmg(State s) => upgrade switch {
+		Upgrade.A => 13,
 		Upgrade.B => 9,
-		_ => 9 - 4*GetZonesCleared(s)
-	};
+		_ => 9
+	} - GetReduction()*GetZonesCleared(s);
 
 	public override List<CardAction> GetActions(State s, Combat c) => [
 		new AAttack {
@@ -729,13 +804,11 @@ internal sealed class HaulAssCard : Card, IRegisterableCard, IHasCustomCardTrait
 	};
 
 	public override List<CardAction> GetActions(State s, Combat c) => [
-		new AEscape {
-			targetPlayer = true
-		},
-		// new AFlee {
-		// 	skipRewards = upgrade != Upgrade.A,
-		// 	keepTemp = true
-		// }
+		new AFlee {
+			targetPlayer = true,
+			skipRewards = upgrade != Upgrade.A,
+			keepTemp = true
+		}
 	];
 
 	public IReadOnlySet<ICardTraitEntry> GetInnateTraits(State state) => new HashSet<ICardTraitEntry> { MundaneManager.MundaneTrait };
@@ -751,7 +824,9 @@ internal sealed class ClockOutCard : Card, IRegisterableCard
 	public override CardData GetData(State state) => new() {
 		cost = 3,
 		singleUse = upgrade != Upgrade.B,
-		description = ModEntry.Instance.Localizations.Localize(["card", "Carrie", CardName, "description", upgrade.ToString()])
+		description = ModEntry.Instance.Localizations.Localize(["card", "Carrie", CardName, "description", upgrade.ToString()], new {
+			Amount = upgrade == Upgrade.A ? 6 : 3
+		})
 	};
 
 	public override List<CardAction> GetActions(State s, Combat c) => [
@@ -883,7 +958,7 @@ internal sealed class ClockOutCard : Card, IRegisterableCard
 	}
 }
 
-internal sealed class ElbowGreaseCard : Card, IRegisterableCard, IHasCustomCardTraits
+internal sealed class RetrofitCard : Card, IRegisterableCard, IHasCustomCardTraits
 {
 	private static string CardName = null!;
 	public static void Register(Deck deck, string charname, IModHelper helper, IPluginPackage<IModManifest> package) {
@@ -898,23 +973,20 @@ internal sealed class ElbowGreaseCard : Card, IRegisterableCard, IHasCustomCardT
 
 	public override List<CardAction> GetActions(State s, Combat c) => upgrade switch {
 		Upgrade.A => [
-			new ACardSelect {
-				browseAction = new CardSelectAddBuoyantForever(),
-				browseSource = CardBrowse.Source.Hand,
-				omitFromTooltips = true,
-				filterBuoyant = false
+			new ARetrofit {
+				drawChange = 1
+			}
+		],
+		Upgrade.B => [
+			new ARetrofit {
+				energyChange = 1,
+				drawChange = -1
 			}
 		],
 		_ => [
 			new AHullMax {
-				amount = -2,
+				amount = 1,
 				targetPlayer = true
-			},
-			new ACardSelect {
-				browseAction = upgrade == Upgrade.B ? new CardSelectAddBuoyantAndRetainForever() : new CardSelectAddBuoyantForever(),
-				browseSource = CardBrowse.Source.Hand,
-				omitFromTooltips = true,
-				filterBuoyant = false
 			}
 		]
 	};

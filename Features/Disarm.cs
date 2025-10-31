@@ -1,16 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using Nanoray.Shrike;
-using Nanoray.Shrike.Harmony;
-using System.Threading.Tasks;
-using Nickel;
 using HarmonyLib;
-using System.Reflection.Emit;
-using System.Reflection;
-using Microsoft.Extensions.Logging;
 using TheJazMaster.UnseenEffort.Artifacts;
-using System.ComponentModel;
 using Shockah.Kokoro;
 
 namespace TheJazMaster.UnseenEffort.Features;

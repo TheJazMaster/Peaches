@@ -10,7 +10,7 @@ public class APackageCards : CardAction
 {
 	public override void Begin(G g, State s, Combat c)
 	{
-		var affectedCards = ModEntry.Instance.KokoroApi.MultiCardBrowse.GetSelectedCards(this)?.ToList() ?? [];
+		var affectedCards = ModEntry.Instance.KokoroApi.MultiCardBrowse.GetSelectedCards(this)?.ToList() ?? [selectedCard];
 	
 		if (affectedCards.Count == 0) return;
 
@@ -22,7 +22,8 @@ public class APackageCards : CardAction
 		foreach (Artifact item in s.EnumerateAllArtifacts()) {
 			if (item is PackageArtifact artifact) {
 				artifact.packagedCards.AddRange(affectedCards);
-				return;
+                artifact.Pulse();
+                return;
 			}
 		}
 		Audio.Play(Event.CardHandling);

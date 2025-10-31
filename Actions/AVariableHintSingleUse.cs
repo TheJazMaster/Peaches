@@ -10,6 +10,10 @@ public class AVariableHintSingleUse : AVariableHint
 {
     public int? value = null;
 
+    public AVariableHintSingleUse() : base() {
+        hand = true;
+    }
+
     public override Icon? GetIcon(State s) {
         return new Icon(StableSpr.icons_singleUse, null, Colors.textMain);
     }
@@ -22,7 +26,7 @@ public class AVariableHintSingleUse : AVariableHint
         }
 		return [
             new TTText(ModEntry.Instance.Localizations.Localize(["action", "variableHintSingleUse"], new { Parentheses = stringHandler.ToStringAndClear() })),
-            new TTGlossary("cardtrait.singleuse")
+            new TTGlossary("cardtrait.singleUse")
         ];
 	}
 }

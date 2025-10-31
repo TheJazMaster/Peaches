@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using FSPRO;
 using Nickel;
 using TheJazMaster.UnseenEffort.Cards.Carrie;
@@ -21,4 +22,10 @@ public class AUnupgradeAndReimburse : CardAction
 		});
 		Audio.Play(Event.Status_PowerDown);
 	}
+
+    public override List<Tooltip> GetTooltips(State s) => [
+        new TTCard {
+            card = new ReimburseCard()
+        }
+    ];
 }

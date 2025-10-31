@@ -11,9 +11,13 @@
             "name": "Carrie",
             "description": [
                 "<c=464764>CARRIE</c>",
-                "Your material handler. At her prime early in a loop. Her cards offer either <c=keyword>very short-term</c> or <c=keyword>unique long term</c> benefits."
+                "Your material handler. At her best early in a loop. Her cards offer either <c=keyword>very short-term</c> or <c=keyword>unique long term</c> benefits."
             ]
         }
+    },
+    "dialogueChoice": {
+        "FairTrade_Accept": "Let's trade.",
+        "FairTrade_Refuse": "Goodbye!"
     },
     "action": {
         "makeFast": {
@@ -58,6 +62,15 @@
         "variableHintSingleUse": "X = the amount of <c=cardtrait>single-use</c> cards in your deck{{Parentheses}}.",
         "upgrade": {
             "cardSelectText": "Choose a card to upgrade."
+        },
+        "sequencedReward": {
+            "card": "FOUND A CARD",
+            "artifact": "FOUND AN ARTIFACT",
+            "sequence": " ({{Index}}/{{Total}})"
+        },
+        "removeFairTrade": {
+            "name": "trade",
+            "description": "Lose 1 <c=artifact>FAIR TRADE</c> to get another <c=heal>repair yard</c> service."
         }
     },
     "status": {
@@ -97,6 +110,14 @@
         "ArtifactFind": {
             "name": "artifact find",
             "description": "For each stack, at the end of combat, choose 1 of 2 artifacts to gain or skip."
+        },
+        "Detour": {
+            "name": "detour",
+            "description": "After combat, you may go to any map node in the next column."
+        },
+        "DetourPlus": {
+            "name": "detour+",
+            "description": "After combat, you may go to any other map node."
         }
     },
     "trait": {
@@ -115,7 +136,7 @@
         },
         "mundane": {
             "name": "mundane",
-            "description": "This card is removed from your deck at the beginning of the final boss fight."
+            "description": "This card is removed from everywhere at the beginning of the final boss fight."
         }
     },
     "artifact": {
@@ -156,23 +177,33 @@
             },
             "MultiTool": {
                 "name": "MULTI-TOOL",
-                "description": "Cards are <c=keyword>twice</c> as likely to appear upgraded in card offerings."
+                "description": "The odds of an offered card being upgraded are increased by an <c=keyword>additional</c> 25%."
             },
-            "SlowAndSteady": {
-                "name": "SLOW AND STEADY",
-                "description": "Draw a card whenever you play a <c=trash>trash</c> card. Enemies cannot gain <c=status>POWERDRIVE</c> or <c=status>SHIELD</c> during their turn."
+            "Watch": {
+                "name": "WATCH",
+                "description": "After every battle, you may choose a <c=cardtrait>temporary</c> card in your deck to keep until the next fight."
             },
             "Forklift": {
                 "name": "FORKLIFT",
-                "description": "Whenever you play an <c=card>upgraded <c=cardtrait>single-use</c> card</c>, add an <c=card>unupgraded</c> copy to the discard pile. On pickup, choose a <c=cardtrait>single-use</c> card to upgrade."
+                "description": "Whenever you play an <c=card>upgraded <c=cardtrait>single-use</c> card</c>, add an <c=card>unupgraded</c> copy to the discard pile.\nOn pickup, choose a <c=cardtrait>single-use</c> card to upgrade."
             },
             "Package": {
                 "name": "PACKAGE",
-                "description": "On the <c=keyword>first turn of a boss fight</c>, add all packaged cards to your hand and remove this artifact. Cards currently packaged:"
+                "description": "On the <c=keyword>first turn of a boss fight</c>, add all packaged cards to your hand and remove this artifact.\nCards currently packaged:"
+            },
+            "RetrofittedParts": {
+                "name": "RETROFITTED PARTS",
+                "description": "Modifies the amount of energy you gain and cards you draw each turn.",
+                "energy": "Energy change: {{Num}}",
+                "draw": "Draw change: {{Num}}"
             },
             "FairTrade": {
                 "name": "FAIR TRADE",
                 "description": "Spend 1 use at a <c=heal>repair yard</c> to get an extra service."
+            },
+            "ElbowGrease": {
+                "name": "ELBOW GREASE",
+                "description": "On pickup, remove a card of your choice. Then upgrade a card of your choice from the same deck."
             }
         },
         "Duo": {
@@ -336,18 +367,24 @@
                     "None": "Remove a card in hand. Put it into a <c=artifact>package</c>."
                 }
             },
-            "Retrieve": {
-                "name": "Retrieve",
-                "description": "Gain {{Amount}} <c=energy>energy</c>. Choose a card in your <c=keyword>draw pile</c> to draw"
+            "InventoryLogs": {
+                "name": "Inventory Logs",
+                "description": {
+                    "A": "Choose three cards in your <c=keyword>draw pile</c> to draw.",
+                    "B": "Make a card in hand <c=cardtrait>buoyant</c> forever.",
+                    "None": "Choose two cards in your <c=keyword>draw pile</c> to draw."
+                },
+                "showCardText": "Added <c=cardtrait>buoyant</c> and <c=cardtrait>retain</c>!",
+                "cardSelectText": "Choose a card to add <c=cardtrait>buoyant</c> and <c=cardtrait>retain</c> to, forever."
             },
             "FixerUpper": {
-                "name": "Fixer Upper"
+                "name": "Fixer-Upper"
             },
             "Unboxing": {
                 "name": "Unboxing",
                 "description": {
                     "A": "Add 1 of {{Amount}} upgraded cards to hand.",
-                    "None": "Add 1 of {{Amount}} unupgraded cards to hand."
+                    "None": "Add {{Amount}} upgraded card to hand."
                 }
             },
             "Repurpose": {
@@ -356,9 +393,9 @@
             "MadeToLast": {
                 "name": "Made To Last",
                 "description": {
-                    "A": "Remove <c=cardtrait>temp</c> from all cards in hand.",
-                    "B": "Remove <c=cardtrait>temp</c> from a card in hand.",
-                    "None": "Remove <c=cardtrait>temp</c> from a card in hand."
+                    "A": "Remove <c=cardtrait>temp</c> from all cards in your deck.",
+                    "B": "Remove <c=cardtrait>temp</c> from a card in your deck.",
+                    "None": "Remove <c=cardtrait>temp</c> from a card in your deck."
                 }
             },
             "TearDown": {
@@ -388,12 +425,14 @@
                     "None": "Choose an <c=artifact>artifact</c> to remove. Gain a <c=card>Fair Trade</c>."
                 },
                 "ui": {
-                    "cancel": "CANCEL"
+                    "cancel": "CANCEL",
+                    "noValid": "No removable artifacts!"
                 }
             },
             "PushThrough": {
                 "name": "Push Through",
-                "description": "Shoot for <c=damage>{{Damage}}</c> dmg. <c=downside>-4 per completed zone this run."
+                "description": "Shoot for <c=damage>{{Damage}}</c> dmg. <c=faint>(-{{Reduction}} per completed zone this run)",
+                "descriptionAlt": "Shoot for <c=damage>{{Damage}}</c> dmg. <c=downside>-{{Reduction}} per completed zone this run."
             },
             "FullEffort": {
                 "name": "Full Effort",
@@ -403,15 +442,15 @@
                     "None": "Choose a <c=cardtrait>temp</c> card in hand to upgrade."
                 }
             },
-            "Unshakable": {
-                "name": "Unshakable"
+            "Unshakeable": {
+                "name": "Unshakeable"
             },
             "SpecialDelivery": {
                 "name": "Special Delivery",
                 "description": {
-                    "A": "Gain 1 <c=status>EXTRA ARTIFACT</c>.",
-                    "B": "Gain 2 <c=status>EXTRA ARTIFACT</c> <c=downside>and 2 <c=card>Delivery Boxes</c>.</c>",
-                    "None": "Gain 1 <c=status>EXTRA ARTIFACT</c> <c=downside>and a <c=card>Delivery Box</c>.</c>"
+                    "A": "Gain 1 <c=status>ARTIFACT FIND</c>.",
+                    "B": "Gain 2 <c=status>ARTIFACT FIND</c> <c=downside>and 2 <c=card>Delivery Boxes</c>.</c>",
+                    "None": "Gain 1 <c=status>ARTIFACT FIND</c> <c=downside>and a <c=card>Delivery Box</c>.</c>"
                 }
             },
             "DeliveryBox": {
@@ -434,15 +473,13 @@
                 },
                 "choiceText": "Choose a crew member"
             },
-            "ElbowGrease": {
-                "name": "Elbow Grease",
+            "Retrofit": {
+                "name": "Retrofix",
                 "description": {
-                    "A": "Make a card in hand <c=cardtrait>buoyant</c> forever.",
-                    "B": "Make a card in hand <c=cardtrait>buoyant</c> and <c=cardtrait>retain</c> forever. <c=downside>-2 max hull.</c>",
-                    "None": "Make a card in hand <c=cardtrait>buoyant</c> forever. <c=downside>-2 max hull.</c>"
-                },
-                "showCardText": "Added <c=cardtrait>buoyant</c> and <c=cardtrait>retain</c>!",
-                "cardSelectText": "Choose a card to add <c=cardtrait>buoyant</c> and <c=cardtrait>retain</c> to, forever."
+                    "A": "Draw <c=card>+1 card</c> per turn, <c=keyword>permanently</c>.",
+                    "B": "Gain <c=energy>+1 energy</c> and <c=downside>draw -1 card</c> per turn. <c=keyword>permanently</c>.",
+                    "None": "<c=hull>+1 max hull</c>. <c=faint>Maybe if you upgrade it..?"
+                }
             },
             "BestOfTheBest": {
                 "name": "Best of the Best"

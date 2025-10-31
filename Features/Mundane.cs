@@ -1,20 +1,16 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Reflection.Emit;
+using HarmonyLib;
 using Nanoray.Shrike;
 using Nanoray.Shrike.Harmony;
-using System.Threading.Tasks;
 using Nickel;
-using HarmonyLib;
-using System.Reflection.Emit;
-using System.Reflection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Xna.Framework.Input.Touch;
-using System.Globalization;
 using TheJazMaster.UnseenEffort.Artifacts.Carrie;
 
 namespace TheJazMaster.UnseenEffort.Features;
 
+[HarmonyPatch]
 public class MundaneManager
 {
     static ModEntry Instance => ModEntry.Instance;
@@ -43,13 +39,41 @@ public class MundaneManager
         });
 
         ModEntry.Instance.Helper.Events.RegisterAfterArtifactsHook(nameof(Artifact.OnCombatStart), (State state, Combat combat) => {
-            if (!(state.map.markers[state.map.currentLocation].contents is MapBattle mapBattle && mapBattle.battleType == BattleType.Boss && state.map.IsFinalZone())) return;
-            foreach (Card card in state.deck) {
-                if (Cards.IsCardTraitActive(state, card, MundaneTrait)) state.RemoveCardFromWhereverItIs(card.uuid);
-            }
+            if (!IsFinalBossNode(state)) return;
+
+            state.deck.RemoveAll(card => Cards.IsCardTraitActive(state, card, MundaneTrait));
             if (state.EnumerateAllArtifacts().OfType<PackageArtifact>().FirstOrDefault() is { } artifact) {
                 artifact.packagedCards.RemoveAll(card => Cards.IsCardTraitActive(state, card, MundaneTrait));
             }
         });
+    }
+
+    private static bool IsFinalBossNode(State state) => state.map.markers[state.map.currentLocation].contents is MapBattle mapBattle && mapBattle.battleType == BattleType.Boss && state.map.IsFinalZone();
+
+    [HarmonyTranspiler]
+    [HarmonyPatch(typeof(CardReward), nameof(CardReward.GetOffering))]
+    private static IEnumerable<CodeInstruction> ACardSelect_BeginWithRoute_Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator il, MethodBase originalMethod)
+    {
+        return new SequenceBlockMatcher<CodeInstruction>(instructions)
+            .Find(
+                ILMatches.Stfld("rarity"),
+                ILMatches.Ldsfld("releasedCards"),
+                ILMatches.AnyLdloc,
+                ILMatches.Instruction(OpCodes.Ldftn),
+                ILMatches.Instruction(OpCodes.Newobj),
+                ILMatches.Call("Where"),
+                ILMatches.Call("ToList")
+            )
+			.Insert(SequenceMatcherPastBoundsDirection.After, SequenceMatcherInsertionResultingBounds.IncludingInsertion, [
+                new(OpCodes.Ldarg_0),
+                new(OpCodes.Call, AccessTools.DeclaredMethod(typeof(MundaneManager), nameof(DontOfferMundaneCards))),
+            ])
+            .AllElements();
+    }
+
+    private static List<Card> DontOfferMundaneCards(List<Card> cards, State s) {
+        if (!IsFinalBossNode(s)) return cards;
+
+        return [.. cards.Where(card => !Cards.IsCardTraitActive(s, card, MundaneTrait))];
     }
 }

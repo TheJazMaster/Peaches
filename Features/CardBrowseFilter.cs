@@ -65,7 +65,7 @@ public class CardBrowseFilterManager
         bool doesFilterSingleUse = ModData.TryGetModData(__instance, FilterSingleUse, out bool filterSingleUse);
         bool doesFilterNoUpgrade = ModData.TryGetModData(__instance, FilterNoUpgrade, out Upgrade filterNoUpgrade);
         Combat combat = g.state.route as Combat ?? DB.fakeCombat;
-        if ((doesFilterFast || doesFilterPriority || doesFilterNoUpgrade) && __instance.browseSource != CardBrowse.Source.Codex) {
+        if ((doesFilterFast || doesFilterPriority || doesFilterNoUpgrade || doesFilterSingleUse) && __instance.browseSource != CardBrowse.Source.Codex) {
             __result.RemoveAll(delegate(Card c)
             {
                 CardData data = c.GetDataWithOverrides(g.state);

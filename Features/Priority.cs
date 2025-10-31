@@ -14,6 +14,7 @@ using System.Globalization;
 
 namespace TheJazMaster.UnseenEffort.Features;
 
+[HarmonyPatch]
 public class PriorityManager
 {
     static ModEntry Instance => ModEntry.Instance;
@@ -68,22 +69,6 @@ public class PriorityManager
                 }
             ]
         });
-
-        Instance.Harmony.TryPatch(
-		    logger: ModEntry.Instance.Logger,
-		    original: AccessTools.DeclaredMethod(typeof(AStartPlayerTurn), nameof(AStartPlayerTurn.Begin)),
-			finalizer: new HarmonyMethod(GetType(), nameof(AStartPlayerTurn_Begin_Finalizer))
-		);
-        Instance.Harmony.TryPatch(
-		    logger: ModEntry.Instance.Logger,
-		    original: AccessTools.DeclaredMethod(typeof(Combat), nameof(Combat.TryPlayCard)),
-			postfix: new HarmonyMethod(GetType(), nameof(Combat_TryPlayCard_Postfix))
-		);
-        // Instance.Harmony.TryPatch(
-		//     logger: ModEntry.Instance.Logger,
-		//     original: AccessTools.DeclaredMethod(typeof(CardReward), nameof(CardReward.Render)),
-		// 	postfix: new HarmonyMethod(GetType(), nameof(CardReward_Render_Postfix))
-		// );
     }
 
     internal static bool HasRuinedPriority(State state, Card? card) {
@@ -96,10 +81,14 @@ public class PriorityManager
         return state.route is Combat c && ModData.TryGetModData(c, RuinedPriorityKey, out bool has) && has;
     }
 
+    [HarmonyFinalizer]
+    [HarmonyPatch(typeof(AStartPlayerTurn), nameof(AStartPlayerTurn.Begin))]
     private static void AStartPlayerTurn_Begin_Finalizer(G g, State s, Combat c) {
         ModData.RemoveModData(c, RuinedPriorityKey);
     }
 
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(Combat), nameof(Combat.TryPlayCard))]
     private static void Combat_TryPlayCard_Postfix(State s, Combat __instance, Card card, bool playNoMatterWhatForFree, bool exhaustNoMatterWhat, ref bool __result) {
         if (__result && !(Helper.Content.Cards.IsCardTraitActive(s, card, PriorityTrait) || Helper.Content.Cards.IsCardTraitActive(s, card, FastTrait)))
             ModData.SetModData(__instance, RuinedPriorityKey, true);

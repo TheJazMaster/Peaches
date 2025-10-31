@@ -4,22 +4,15 @@ using TheJazMaster.UnseenEffort.Actions;
 
 namespace TheJazMaster.UnseenEffort.Features;
 
-public class SingleDamModManager
+[HarmonyPatch]
+public class SingleDamModManager(PDamMod mod)
 {
     private static IModData ModData => ModEntry.Instance.Helper.ModData;
     internal const string OldDamageModifierKey = "OldDamageModifier";
-    private readonly PDamMod mod;
+    private readonly PDamMod mod = mod;
 
-    public SingleDamModManager(PDamMod mod)
-    {
-        this.mod = mod;
-        ModEntry.Instance.Harmony.TryPatch(
-		    logger: ModEntry.Instance.Logger,
-		    original: AccessTools.DeclaredMethod(typeof(Ship), nameof(Ship.ModifyDamageDueToParts)),
-			postfix: new HarmonyMethod(GetType(), nameof(Ship_ModifyDamageDueToParts_Postfix))
-		);
-    }
-
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(Ship), nameof(Ship.ModifyDamageDueToParts))]
     private static void Ship_ModifyDamageDueToParts_Postfix(Ship __instance, State s, Combat c, Part part, bool piercing = false)
     {   
         bool isSingleUse = ModData.TryGetModData<PDamMod>(part, OldDamageModifierKey, out var oldDamageModifier);

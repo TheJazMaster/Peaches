@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using FSPRO;
 using HarmonyLib;
-using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
-using Microsoft.Xna.Framework.Audio;
 using Nanoray.PluginManager;
+using Nanoray.Shrike;
+using Nanoray.Shrike.Harmony;
 using Nickel;
 using TheJazMaster.UnseenEffort.Actions;
 using TheJazMaster.UnseenEffort.Features;
@@ -43,43 +44,59 @@ public class MultiToolArtifact : Artifact, IRegisterableArtifact
 	}
 
 
-	[HarmonyPrefix]
-	[HarmonyPatch(typeof(CardReward), nameof(CardReward.GetUpgrade))]
-	private static void CardReward_GetUpgrade_Prefix(State s, Rand rng, MapBase zone, Card card, ref double oddsMultiplier, bool? overrideUpgradeChances = null) {
-		if (s.EnumerateAllArtifacts().OfType<MultiToolArtifact>().Any()) oddsMultiplier *= 2;
-	}
+    [HarmonyTranspiler]
+    [HarmonyPatch(typeof(CardReward), nameof(CardReward.GetUpgrade))]
+    private static IEnumerable<CodeInstruction> CardReward_GetUpgrade_Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator il, MethodBase originalMethod)
+    {
+        return new SequenceBlockMatcher<CodeInstruction>(instructions)
+            .Find(
+                ILMatches.Ldarg(2),
+                ILMatches.Call("GetUpgradeChance"),
+                ILMatches.AnyLdarg,
+                ILMatches.Instruction(OpCodes.Mul),
+                ILMatches.Stloc<double>(originalMethod)
+            )
+            .PointerMatcher(SequenceMatcherRelativeElement.Last)
+            .Insert(SequenceMatcherPastBoundsDirection.Before, SequenceMatcherInsertionResultingBounds.IncludingInsertion, [
+                new(OpCodes.Ldarg_0),
+                new(OpCodes.Call, AccessTools.DeclaredMethod(typeof(MultiToolArtifact), nameof(GetFlatModifier))),
+                new(OpCodes.Add),
+            ])
+            .AllElements();
+    }
+
+    private static double GetFlatModifier(State s) => s.EnumerateAllArtifacts().OfType<MultiToolArtifact>().Any() ? 0.25 : 0;
 }
 
-[HarmonyPatch]
-public class SlowAndSteadyArtifact : Artifact, IRegisterableArtifact
+public class WatchArtifact : Artifact, IRegisterableArtifact
 {
 	public static void Register(Deck deck, string charname, IModHelper helper, IPluginPackage<IModManifest> package)
 	{
 		IRegisterableArtifact.Register(MethodBase.GetCurrentMethod()!.DeclaringType!, deck, charname, [ArtifactPool.Common], helper, package, out _);
 	}
 
-	public override void OnPlayerPlayCard(int energyCost, Deck deck, Card card, State state, Combat combat, int handPosition, int handCount)
+	public override void OnCombatEnd(State state)
 	{
-		if (deck == Deck.trash) combat.Queue(new ADrawCard {
-			count = 1,
-			artifactPulse = Key()
+		state.rewardsQueue.QueueImmediate(new ACardSelect
+		{
+			browseAction = new IntermediateAction(),
+			browseSource = CardBrowse.Source.Deck,
+			filterTemporary = true,
+			allowCloseOverride = true
 		});
 	}
 
-	[HarmonyPrefix]
-	[HarmonyPatch(typeof(AStatus), nameof(AStatus.Begin))]
-	private static bool AStatus_Begin_Prefix(AStatus __instance, G g, State s, Combat c) {
-		if (s.EnumerateAllArtifacts().OfType<MultiToolArtifact>().FirstOrDefault() is not { } artifact) return true;
-		
-		if (__instance.targetPlayer || !(__instance.status == Status.shield || __instance.status == Status.powerdrive)) return true;
-		if (__instance.mode switch {
-			AStatusMode.Set => __instance.statusAmount > c.otherShip.Get(__instance.status),
-			_ => __instance.statusAmount > 0,
-		}) return true;
+    class IntermediateAction : CardAction {
+        public override void Begin(G g, State s, Combat c)
+        {
+			if (selectedCard == null) return;
 
-		artifact.Pulse();
-		Audio.Play(Event.Status_PowerDown);
-		return false;
+            s.RemoveCardFromWhereverItIs(selectedCard.uuid);
+            s.rewardsQueue.Queue(new AAddCard
+            {
+                card = selectedCard
+            });
+        }
 	}
 }
 
@@ -108,12 +125,48 @@ public class ForkliftArtifact : Artifact, IRegisterableArtifact
 		state.GetCurrentQueue().QueueImmediate(new ACardSelect {
 			browseAction = new AUpgrade(),
 			browseSource = CardBrowse.Source.Deck,
+			filterUpgrade = Upgrade.None
 		}.ApplyModData(CardBrowseFilterManager.FilterSingleUse, true));
 	}
 
 	public override List<Tooltip>? GetExtraTooltips() => [
 		new TTGlossary("cardtrait.singleuse")
 	];
+}
+
+public class ElbowGreaseArtifact : Artifact, IRegisterableArtifact
+{
+	public static void Register(Deck deck, string charname, IModHelper helper, IPluginPackage<IModManifest> package)
+	{
+		IRegisterableArtifact.Register(MethodBase.GetCurrentMethod()!.DeclaringType!, deck, charname, [ArtifactPool.Common], helper, package, out _);
+	}
+
+	public override void OnReceiveArtifact(State state)
+	{
+        HashSet<Card> list = [.. state.deck];
+		if (state.route is Combat c) {
+            list.UnionWith(c.discard.Concat(c.hand).Concat(c.exhausted));
+        }
+
+		state.GetCurrentQueue().QueueImmediate(
+			new AUpgradeCardSelectLimited {
+				comparisonList = list
+			}
+		);
+        state.GetCurrentQueue().QueueImmediate(
+            new ARemoveCard {
+                allowCancel = true
+            }
+        );
+	}
+
+	[HarmonyPostfix]
+	[HarmonyPatch(typeof(CardBrowse), nameof(CardBrowse.GetCardList))]
+	private static void CardBrowse_GetCardList_Postfix(G g, CardBrowse __instance, List<Card> __result) {
+		if (ModEntry.Instance.Helper.ModData.TryGetModData(__instance, AUpgradeCardSelectLimited.LimitDeckKey, out Deck data)) {
+            __result.RemoveAll(card => card.GetMeta().deck != data);
+        }
+	}
 }
 
 public class PackageArtifact : Artifact, IRegisterableArtifact
@@ -127,23 +180,63 @@ public class PackageArtifact : Artifact, IRegisterableArtifact
 
 	public override void OnCombatStart(State state, Combat combat)
 	{
-		if (state.map.markers[state.map.currentLocation].contents is MapBattle mapBattle && mapBattle.battleType == BattleType.Boss) {
-			List<CardAction> actions = [
-				.. packagedCards.Select(card => new AAddCard {
-					card = card,
-					destination = CardDestination.Hand,
-					artifactPulse = Key()
-				}),
-				new ALoseArtifact {
-					artifactType = Key()
-				}
-			];
-		}
+        if (state.map.markers[state.map.currentLocation].contents is MapBattle mapBattle && mapBattle.battleType == BattleType.Boss) {
+            combat.Queue([
+                .. packagedCards.Select(card => new AAddCard {
+                    card = card,
+                    destination = CardDestination.Hand,
+                    timer = 1.5 / Math.Max(1, packagedCards.Count),
+                    artifactPulse = Key()
+                }),
+                new ALoseArtifact {
+                    artifactType = Key()
+                }
+            ]);
+        }
+    }
+
+	public override List<Tooltip>? GetExtraTooltips() => [
+		.. packagedCards.Select(card => new TTText {
+			text = card.GetFullDisplayName()
+		}),
+		new TTDivider(),
+		.. packagedCards.Select(card => new TTCard {
+			card = card
+		})
+	];
+}
+
+public class RetrofittedPartsArtifact : Artifact, IRegisterableArtifact
+{
+    public int plusEnergy;
+    public int plusDraw;
+
+    public static void Register(Deck deck, string charname, IModHelper helper, IPluginPackage<IModManifest> package)
+	{
+		IRegisterableArtifact.Register(MethodBase.GetCurrentMethod()!.DeclaringType!, deck, charname, [], helper, package, out _);
 	}
 
-	public override List<Tooltip>? GetExtraTooltips() => packagedCards.Select(card => new TTCard {
-		card = card
-	}).ToList<Tooltip>();
+    public override void OnRemoveArtifact(State state)
+    {
+        state.ship.baseDraw -= plusDraw;
+		state.ship.baseEnergy -= plusEnergy;
+    }
+
+    public override void OnReceiveArtifact(State state)
+    {
+        state.ship.baseDraw += plusDraw;
+		state.ship.baseEnergy += plusEnergy;
+    }
+
+	public override List<Tooltip>? GetExtraTooltips() => [
+		new TTText {
+			text = ModEntry.Instance.Localizations.Localize(["artifact", "Carrie", "RetrofittedParts", "draw"], new { Num = plusDraw })
+		},
+		new TTDivider(),
+		new TTText {
+			text = ModEntry.Instance.Localizations.Localize(["artifact", "Carrie", "RetrofittedParts", "energy"], new { Num = plusEnergy })
+		}
+	];
 }
 
 public class FairTradeArtifact : Artifact, IRegisterableArtifact
@@ -154,4 +247,6 @@ public class FairTradeArtifact : Artifact, IRegisterableArtifact
 	{
 		IRegisterableArtifact.Register(MethodBase.GetCurrentMethod()!.DeclaringType!, deck, charname, [], helper, package, out _);
 	}
+
+    public override int? GetDisplayNumber(State s) => uses;
 }
